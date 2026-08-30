@@ -224,7 +224,7 @@ const documentationBtn = document.getElementById("document");
 
 if (documentationBtn) {
     documentationBtn.addEventListener("click", () => {
-        window.location.href = "Documentation.html";
+        window.location.href = "documentation.html";
     });
 }
 
