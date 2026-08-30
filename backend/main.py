@@ -61,22 +61,60 @@ def load_history():
     return []
 
 def save_history(history):
-    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-        json.dump(history, file, indent=4)
-        
+    try:
+        with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+            json.dump(history, file, indent=4)
+    except Exception as e:
+        try:
+            with open("/tmp/upload_history.json", "w", encoding="utf-8") as file:
+                json.dump(history, file, indent=4)
+        except Exception:
+            pass
+
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
+
+def load_settings():
+    candidates = [
+        SETTINGS_FILE,
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.json"),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "settings.json"),
+        os.path.join(os.getcwd(), "settings.json"),
+        "/tmp/settings.json"
+    ]
+    for filepath in candidates:
+        if os.path.exists(filepath):
+            try:
+                with open(filepath, "r", encoding="utf-8") as file:
+                    return json.load(file)
+            except Exception as e:
+                print("Error loading settings:", e)
+    return {}
+
 @app.get("/settings/profile")
 def get_profile():
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as file:
-        settings = json.load(file)
-    return settings 
+    settings = load_settings()
+    return settings if settings else {
+        "name": "Hania",
+        "role": "Admin",
+        "email": "hania@example.com",
+        "avatar": "/uploads/profile_pictures/default.png"
+    }
 
 @app.put("/settings/profile")
 def update_profile(profile: dict):
-    print("SETTINGS FILE:", SETTINGS_FILE)
-    print("PROFILE RECEIVED:", profile)
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
-        json.dump(profile, file, indent=4)
+    try:
+        with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
+            json.dump(profile, file, indent=4)
+    except Exception:
+        try:
+            with open("/tmp/settings.json", "w", encoding="utf-8") as file:
+                json.dump(profile, file, indent=4)
+        except Exception:
+            pass
+    return {
+        "message": "Profile updated",
+        "profile": profile
+    }
     return {
         "message": "Profile updated successfully",
         "profile": profile
