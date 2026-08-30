@@ -96,6 +96,7 @@ async function initAIRemediation() {
             "dark:text-green-400"
         );
     }
+    }
     const elemDate = document.getElementById("remediationFindingDate");
     if (elemDate) elemDate.textContent = `• Detected on ${selectedFinding.date_detected || ''}`;
     const elemEndpoint = document.getElementById("remediationFindingEndpoint");
@@ -600,33 +601,34 @@ if (selectedFinding.title.includes("SQL Injection")) {
         "The secure version applies appropriate security controls to validate and safely handle user-controlled data, reducing the risk of exploitation.";
 
 }
-secureCodeExplanation.textContent = explanation;
-
-const markResolvedBtn=document.getElementById("markResolvedBtn")
-const statusDot=document.getElementById("statusDot")
-const statusText=document.getElementById("statusText")
-const markResolvedText=document.getElementById("markResolvedText")
-markResolvedBtn.addEventListener("click", async () => {
-    try {
-        const apiUrl = window.getApiUrl ? window.getApiUrl(`/findings/${selectedFinding.id}/status?status=Resolved`) : `/findings/${selectedFinding.id}/status?status=Resolved`;
-        const response = await fetch(apiUrl,
-            {
-                method: "PATCH"
+const markResolvedBtn = document.getElementById("markResolvedBtn");
+const statusText = document.getElementById("statusText");
+const markResolvedText = document.getElementById("markResolvedText");
+if (markResolvedBtn) {
+    markResolvedBtn.addEventListener("click", async () => {
+        try {
+            const apiUrl = window.getApiUrl ? window.getApiUrl(`/findings/${selectedFinding.id}/status?status=Resolved`) : `/findings/${selectedFinding.id}/status?status=Resolved`;
+            const response = await fetch(apiUrl,
+                {
+                    method: "PATCH"
+                }
+            );
+            const data = await response.json();
+            console.log("STATUS UPDATE:", data);
+            if (!response.ok) {
+                throw new Error(data.detail || "Failed to update status");
             }
-        );
-        const data = await response.json();
-        console.log("STATUS UPDATE:", data);
-        if (!response.ok) {
-            throw new Error(data.detail || "Failed to update status");
+            if (statusText) statusText.textContent = "Resolved";
+            if (statusDot) {
+                statusDot.classList.remove("bg-red-500");
+                statusDot.classList.add("bg-green-500");
+            }
+            if (markResolvedText) markResolvedText.textContent = "Resolved";
+        } catch (error) {
+            console.error("STATUS UPDATE ERROR:", error);
         }
-        statusText.textContent = "Resolved";
-        statusDot.classList.remove("bg-red-500");
-        statusDot.classList.add("bg-green-500");
-        markResolvedText.textContent = "Resolved";
-    } catch (error) {
-        console.error("STATUS UPDATE ERROR:", error);
-    }
-});
+    });
+}
 
 const generateRemediationBtn=document.getElementById("generateRemediationBtn")
 const generateRemediationText=document.getElementById("generateRemediationText")
@@ -691,7 +693,8 @@ if (viewDocumentationBtn) {
         window.location.href = "findings_documentation.html";
     });
 }
-} // end initAIRemediation
+}
+}
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAIRemediation);
