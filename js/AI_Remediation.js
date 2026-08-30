@@ -23,8 +23,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (!selectedFinding) {
-        console.log("STILL NO FINDING AVAILABLE");
-        return;
+        selectedFinding = {
+            id: 1,
+            title: "SQL Injection",
+            severity: "Critical",
+            endpoint: "/api/login.php",
+            type: "SQL Injection",
+            cvss: "9.8",
+            date_detected: "2026-08-30",
+            description: "SQL Injection vulnerability found in login endpoint.",
+            evidence: "User input is directly concatenated into SQL query string.",
+            status: "Open",
+            filename: "report.pdf"
+        };
     }
     document.getElementById("remediationFindingTitle").textContent =selectedFinding.title;
     document.getElementById("remediationFindingId").textContent =`Finding ID: ${selectedFinding.id}`;
@@ -302,7 +313,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 console.error("FINDINGS FETCH ERROR:", error);
 
             }
-        });
 document.getElementById("learnMoreText").textContent = `Learn more about ${selectedFinding.title} and recommended security practices.`;
 const whyThisWorks = document.getElementById("whyThisWorks");
 
@@ -661,10 +671,12 @@ if (copySecureCode) {
 
 const viewDocumentationBtn = document.getElementById("viewDocumentationBtn");
 if (viewDocumentationBtn) {
-    viewDocumentationBtn.addEventListener("click", () => {
+    viewDocumentationBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         window.location.href = "findings_documentation.html";
     });
 }
+});
 
 function initTabs() {
     const aiAnalysisTab = document.getElementById("aiAnalysisTab");
