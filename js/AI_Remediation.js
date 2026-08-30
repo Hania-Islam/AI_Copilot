@@ -629,127 +629,103 @@ generateRemediationBtn.addEventListener("click", async () => {
     }
 });
 
-const copyVulnerableCode = document.getElementById("copyVulnerableCode")
-copyVulnerableCode.addEventListener("click",()=>{
-    const codeText=vulnerableCode.textContent
-    navigator.clipboard.writeText(codeText)
-    copyVulnerableCode.innerHTML=`<i data-lucide="check" class="w-4 h-4 text-slate-500"></i>`
-    lucide.createIcons()
-    setTimeout(()=>{
-        copyVulnerableCode.innerHTML = ` <i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>`
-        lucide.createIcons()
-    },2000)
-})
+const copyVulnerableCode = document.getElementById("copyVulnerableCode");
+if (copyVulnerableCode) {
+    copyVulnerableCode.addEventListener("click", () => {
+        const vulnerableCodeElem = document.getElementById("vulnerableCode");
+        const codeText = vulnerableCodeElem ? vulnerableCodeElem.textContent : "";
+        navigator.clipboard.writeText(codeText);
+        copyVulnerableCode.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-slate-500"></i>`;
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => {
+            copyVulnerableCode.innerHTML = `<i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>`;
+            if (window.lucide) lucide.createIcons();
+        }, 2000);
+    });
+}
 
-const copySecureCode = document.getElementById("copySecureCode")
-copySecureCode.addEventListener("click",()=>{
-    const secureCodeText=secureCode.textContent
-    navigator.clipboard.writeText(secureCodeText)
-    copySecureCode.innerHTML=`<i data-lucide="check" class="w-4 h-4 text-slate-500"></i>`
-    lucide.createIcons()
-    setTimeout(()=>{
-        copySecureCode.innerHTML = ` <i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>`
-        lucide.createIcons()
-    },2000)
-})
+const copySecureCode = document.getElementById("copySecureCode");
+if (copySecureCode) {
+    copySecureCode.addEventListener("click", () => {
+        const secureCodeElem = document.getElementById("secureCode");
+        const secureCodeText = secureCodeElem ? secureCodeElem.textContent : "";
+        navigator.clipboard.writeText(secureCodeText);
+        copySecureCode.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-slate-500"></i>`;
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => {
+            copySecureCode.innerHTML = `<i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>`;
+            if (window.lucide) lucide.createIcons();
+        }, 2000);
+    });
+}
 
-const viewDocumentationBtn = document.getElementById("viewDocumentationBtn")
-viewDocumentationBtn.addEventListener("click", () => {
-    window.location.href = "findings_documentation.html"
-})
+const viewDocumentationBtn = document.getElementById("viewDocumentationBtn");
+if (viewDocumentationBtn) {
+    viewDocumentationBtn.addEventListener("click", () => {
+        window.location.href = "findings_documentation.html";
+    });
+}
 
-
-document.addEventListener("DOMContentLoaded", function () {
+function initTabs() {
     const aiAnalysisTab = document.getElementById("aiAnalysisTab");
     const remediationTab = document.getElementById("remediationTab");
     const codeExampleTab = document.getElementById("codeExampleTab");
     const referenceTab = document.getElementById("referenceTab");
 
-    // CONTENT SECTIONS
     const aiAnalysisContent = document.getElementById("aiAnalysisContent");
     const remediationContent = document.getElementById("remediationContent");
     const codeExampleContent = document.getElementById("codeExampleContent");
     const referencesContent = document.getElementById("referencesContent");
 
-    // ALL TABS
-    const tabs = [
-        aiAnalysisTab,
-        remediationTab,
-        codeExampleTab,
-        referenceTab
-    ];
+    if (!aiAnalysisTab || !remediationTab || !codeExampleTab || !referenceTab) return;
 
-    // ALL CONTENT
-    const contents = [
-        aiAnalysisContent,
-        remediationContent,
-        codeExampleContent,
-        referencesContent
-    ];
+    const tabs = [aiAnalysisTab, remediationTab, codeExampleTab, referenceTab];
+    const contents = [aiAnalysisContent, remediationContent, codeExampleContent, referencesContent];
 
-    // RESET TAB STYLES
     function resetTabs() {
         tabs.forEach(function (tab) {
-            tab.classList.remove(
-                "text-blue-500",
-                "underline",
-                "decoration-blue-500",
-                "decoration-2",
-                "underline-offset-4"
-            );
-            tab.classList.add(
-                "text-slate-500",
-                "dark:text-slate-400"
-            );
+            if (tab) {
+                tab.classList.remove("text-blue-500", "underline", "decoration-blue-500", "decoration-2", "underline-offset-4");
+                tab.classList.add("text-slate-500", "dark:text-slate-400");
+            }
         });
     }
 
-    // HIDE ALL CONTENT
     function hideAllContent() {
         contents.forEach(function (content) {
-            content.classList.add("hidden");
+            if (content) content.classList.add("hidden");
         });
     }
 
-    // SHOW TAB
     function showTab(activeTab, activeContent) {
         resetTabs();
         hideAllContent();
-        activeTab.classList.remove(
-            "text-slate-500",
-            "dark:text-slate-400"
-        );
-
-        activeTab.classList.add(
-            "text-blue-500",
-            "underline",
-            "decoration-blue-500",
-            "decoration-2",
-            "underline-offset-4"
-        );
-        activeContent.classList.remove("hidden");
-
+        if (activeTab) {
+            activeTab.classList.remove("text-slate-500", "dark:text-slate-400");
+            activeTab.classList.add("text-blue-500", "underline", "decoration-blue-500", "decoration-2", "underline-offset-4");
+        }
+        if (activeContent) activeContent.classList.remove("hidden");
     }
 
-    // AI ANALYSIS
     aiAnalysisTab.addEventListener("click", function () {
-        showTab(aiAnalysisTab,aiAnalysisContent);
+        showTab(aiAnalysisTab, aiAnalysisContent);
     });
 
-    // REMEDIATION
     remediationTab.addEventListener("click", function () {
-        showTab( remediationTab, remediationContent);
+        showTab(remediationTab, remediationContent);
     });
 
-
-    // CODE EXAMPLE
     codeExampleTab.addEventListener("click", function () {
-        showTab( codeExampleTab, codeExampleContent);
+        showTab(codeExampleTab, codeExampleContent);
     });
 
-    // REFERENCES
     referenceTab.addEventListener("click", function () {
-        showTab( referenceTab, referencesContent );
+        showTab(referenceTab, referencesContent);
     });
+}
 
-});
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTabs);
+} else {
+    initTabs();
+}
