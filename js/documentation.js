@@ -28,6 +28,7 @@ async function initDocumentation() {
         };
     }
 
+    const titleElem = document.getElementById("documentationTitle");
     if (titleElem) {
         titleElem.textContent = `${selectedFinding.title} Documentation`;
     }
