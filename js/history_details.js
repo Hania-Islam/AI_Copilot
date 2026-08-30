@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("fileType").textContent = selectedUpload.file_type;
     document.getElementById("findingsCount").textContent = selectedUpload.findings_count;
     document.getElementById("fileStatus").lastChild.textContent = selectedUpload.status;
-    document.getElementById("uploadTime").textContent =`Uploaded: ${selectedUpload.upload_time}`;
+    document.getElementById("uploadTime").textContent = `Uploaded: ${selectedUpload.upload_time}`;
 
     // RISK SCORE
     const cvssScores = selectedUpload.findings
@@ -24,23 +24,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const riskScore = Math.round(highestCvss * 10);
     document.getElementById("riskScore").textContent =
         riskScore;
-        const riskCircle = document.getElementById("riskCircle");
+    const riskCircle = document.getElementById("riskCircle");
 
-const circumference = 94.25;
-const riskOffset =circumference - (circumference * riskScore / 100);
-riskCircle.style.strokeDashoffset = riskOffset;
-if (riskScore >= 80) {
-    riskCircle.classList.add("text-red-500");
-}
-else if (riskScore >= 60) {
-    riskCircle.classList.add("text-orange-500");
-}
-else if (riskScore >= 40) {
-    riskCircle.classList.add("text-yellow-500");
-}
-else {
-    riskCircle.classList.add("text-green-500");
-}
+    const circumference = 94.25;
+    const riskOffset = circumference - (circumference * riskScore / 100);
+    riskCircle.style.strokeDashoffset = riskOffset;
+    if (riskScore >= 80) {
+        riskCircle.classList.add("text-red-500");
+    }
+    else if (riskScore >= 60) {
+        riskCircle.classList.add("text-orange-500");
+    }
+    else if (riskScore >= 40) {
+        riskCircle.classList.add("text-yellow-500");
+    }
+    else {
+        riskCircle.classList.add("text-green-500");
+    }
 
     // CRITICAL COUNT
     const criticalCount = selectedUpload.findings.filter(
@@ -49,12 +49,12 @@ else {
 
     document.getElementById("criticalCount").textContent = criticalCount;
 
-// FINDINGS
-const findingsContainer = document.getElementById("findingsContainer");
-selectedUpload.findings.forEach(finding => {
-    const findingCard = document.createElement("div");
-    findingCard.className =
-        "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-4";
+    // FINDINGS
+    const findingsContainer = document.getElementById("findingsContainer");
+    selectedUpload.findings.forEach(finding => {
+        const findingCard = document.createElement("div");
+        findingCard.className =
+            "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-4";
 
         findingCard.innerHTML = `
         <div class="flex items-start justify-between gap-4">
@@ -68,13 +68,13 @@ selectedUpload.findings.forEach(finding => {
     
                     <span class="px-2 py-0.5 rounded-md text-[10px] font-medium
                         ${finding.severity === "Critical"
-                            ? "bg-red-500/10 text-red-500"
-                            : finding.severity === "High"
-                            ? "bg-orange-500/10 text-orange-500"
-                            : finding.severity === "Medium"
-                            ? "bg-yellow-500/10 text-yellow-500"
-                            : "bg-blue-500/10 text-blue-500"
-                        }">
+                ? "bg-red-500/10 text-red-500"
+                : finding.severity === "High"
+                    ? "bg-orange-500/10 text-orange-500"
+                    : finding.severity === "Medium"
+                        ? "bg-yellow-500/10 text-yellow-500"
+                        : "bg-blue-500/10 text-blue-500"
+            }">
                         ${finding.severity}
                     </span>
     
@@ -93,9 +93,9 @@ selectedUpload.findings.forEach(finding => {
     
                 <span class="px-2.5 py-1 rounded-md
                     ${finding.status.toLowerCase() === "fixed"
-                        ? "bg-green-500/10 text-green-500"
-                        : "bg-slate-500/10 text-slate-500"
-                    }
+                ? "bg-green-500/10 text-green-500"
+                : "bg-slate-500/10 text-slate-500"
+            }
                     text-xs font-medium">
                     ${finding.status}
                 </span>
@@ -146,12 +146,12 @@ selectedUpload.findings.forEach(finding => {
             </span>
         </div>
     `;
-    findingsContainer.appendChild(findingCard);
-});
+        findingsContainer.appendChild(findingCard);
+    });
 
-document.getElementById("backToHistory").addEventListener("click", () => {
-    window.location.href = "history.html";
-});
+    document.getElementById("backToHistory").addEventListener("click", () => {
+        window.location.href = "History.html";
+    });
 
     // LUCIDE ICONS
     lucide.createIcons();
