@@ -1,0 +1,56 @@
+{
+    "name": "",
+    "email": "",
+    "username": "",
+    "role": "",
+    "notifications": {
+        "email": false,
+        "security": true,
+        "reports": false,
+        "updates": true
+    },
+    "appearance": {
+        "theme": "dark",
+        "primary_color": "pink"
+    },
+    "security": {
+        "two_factor_enabled": true,
+        "active_sessions": [
+            {
+                "id": "session_1",
+                "device": "Mac",
+                "browser": "Chrome",
+                "location": "Pakistan",
+                "last_active": "2026-08-27 12:30 PM",
+                "current": true
+            }
+        ],
+        "login_history": [
+            {
+                "date": "2026-08-27",
+                "time": "12:30 PM",
+                "device": "Mac",
+                "location": "Pakistan",
+                "status": "Success"
+            },
+            {
+                "date": "2026-08-26",
+                "time": "09:15 PM",
+                "device": "Mac",
+                "location": "Pakistan",
+                "status": "Success"
+            }
+        ]
+    },
+    "api": {
+        "api_key": "sk-117e59f428b55e3412315bbf1492cab8",
+        "integrations": [
+            {
+                "id": "3d6569ab59527068",
+                "service": "github",
+                "token": "test-github-token",
+                "status": "Connected"
+            }
+        ]
+    }
+}

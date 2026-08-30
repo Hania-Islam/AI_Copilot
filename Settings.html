@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Security Copilot-Dashbaord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="font-[Inter] overflow-x-hidden bg-slate-950">
+
+   <!-- MOBILE HEADER -->
+<header class="md:hidden sticky top-0 z-30 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+    <div class="h-14 px-3 flex items-center justify-between gap-2"> 
+    <div class="flex items-center gap-2 min-w-0">
+    <img src="assets/logo/logo.png" alt="AI Security Copilot Logo" class="w-8 h-8 shrink-0">
+    <p class="text-slate-900 dark:text-white font-bold text-[13px] truncate">
+       <span class="text-blue-500">AI</span> Security Copilot
+    </p>
+</div>
+
+<div class="flex items-center gap-1 shrink-0">
+    <button id="mobileMenuBtn" class="text-slate-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 text-2xl p-2" aria-label="Open menu">☰</button>
+</div>
+</div>
+</header>
+    <!-- MOBILE PAGE HEADING -->
+<div class="md:hidden px-4 pt-5 pb-3 bg-slate-950">
+    <h1 class="text-white text-xl font-semibold">
+        Settings
+    </h1>
+    <p class="text-slate-400 text-xs mt-1">
+        Manage your preferences and application settings
+    </p>
+</div>
+
+<!-- MOBILE DRAWER-->
+
+    <div id="mobileOverlay" class="hidden fixed inset-0 bg-black/40 dark:bg-black/60 z-40"></div>
+    <aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] -translate-x-full transition-transform duration-300 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto md:hidden">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-3">
+                <img alt="AI Security Copilot Logo" class="w-10 h-10" src="assets/logo/logo.png"/>
+                <p class="text-slate-900 dark:text-white font-bold text-base leading-tight">
+                    <span class="text-blue-500">AI</span> Security<br/>Copilot
+                </p>
+            </div>
+            <button aria-label="Close menu" class="text-slate-600 dark:text-slate-300 text-2xl p-2" id="mobileCloseBtn">×</button>
+        </div>
+        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">Main</p>
+
+        <nav class="space-y-2">
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="dashboard.html">
+                <i class="w-5 h-5" data-lucide="layout-dashboard"></i>
+                <span class="font-medium text-sm">Dashboard</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="AnalyzeReport.html">
+                <i class="w-5 h-5" data-lucide="file-search"></i>
+                <span class="text-sm font-medium">Analyze Report</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Findings.html">
+                <i class="w-5 h-5" data-lucide="shield-alert"></i>
+                <span class="text-sm font-medium">Findings</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="AI_Remediation.html">
+                <i class="w-5 h-5" data-lucide="sparkles"></i>
+                <span class="text-sm font-medium">AI Remediation</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="History.html">
+                <i class="w-5 h-5" data-lucide="history"></i>
+                <span class="text-sm font-medium">History</span>
+            </a>
+        </nav>
+
+<!-- System -->
+
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-8 mb-3">System</p>
+        <nav class="space-y-2">
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400 " href="Settings.html">
+                <i class="w-5 h-5" data-lucide="settings"></i>
+                <span class="text-sm font-medium">Settings</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Logout.html">
+                <i class="w-5 h-5" data-lucide="log-out"></i>
+                <span class="text-sm font-medium">Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+
+    <!-- DESKTOP LAYOUT -->
+    <div class="flex min-h-screen">
+        <!-- DESKTOP SIDEBAR-->    
+                <aside class="hidden md:flex sticky top-0 h-screen w-64 flex-shrink-0 flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800">    
+        <!-- LOGO -->    
+                    <div class="px-4 pt-4">    
+                        <div class="flex items-center gap-3">    
+                            <img src="assets/logo/logo.png" alt="AI Security Copilot Logo" class="w-12 h-12">    
+                            <p class="text-slate-900 dark:text-white font-bold text-lg leading-tight">    
+                                <span class="text-blue-500">AI</span> Security<br>Copilot    
+                            </p>        
+                        </div>
+        <!-- Tagline -->        
+                        <p class="text-[12px] leading-4 text-slate-500 dark:text-slate-400 mt-2 px-4 whitespace-nowrap"> Smart Analysis<br>Stronger Security        
+                        </p>        
+                    </div>
+        <!-- Navigation -->        
+                    <nav class="mt-8 px-4 flex-1 flex flex-col">        
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-3">Main</p>        
+                        <div class="space-y-2">        
+                            <a href="dashboard.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">        
+                                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>        
+                                <span class="font-medium text-sm">Dashboard</span>        
+                            </a>
+        
+                            <a href="AnalyzeReport.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">        
+                                <i data-lucide="file-search" class="w-5 h-5"></i>        
+                                <span class="text-sm font-medium">Analyze Report</span>        
+                            </a>
+                            <a href="Findings.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:hover:text-slate-900 dark:hover:text-white transition">
+                                <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                                <span class="text-sm font-medium">Findings</span>
+                            </a>
+        
+                            <a href="AI_Remediation.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">        
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>        
+                                <span class="text-sm font-medium">AI Remediation</span>        
+                            </a>
+
+                            <a href="History.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                                <i data-lucide="history" class="w-5 h-5"></i>        
+                                <span class="text-sm font-medium">History</span>        
+                            </a>        
+                        </div>
+        
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider mt-8 mb-3">System</p>        
+                        <a href="Settings.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400 ">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span class="text-sm font-medium">Settings</span>
+                        </a>
+        
+                        <a href="Logout.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">        
+                            <i data-lucide="log-out" class="w-5 h-5"></i>                                    <span class="text-sm font-medium">Logout</span>
+                        </a>
+                    </nav>
+                </aside>
+
+        <!-- MAIN -->
+        <main class="flex-1 min-w-0">
+            <!-- TOPBAR -->            
+                        <div id="desktopTopbar" class="hidden md:flex bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-20 justify-between items-center px-3 md:px-4 lg:px-6 xl:px-8 gap-2 lg:gap-4">            
+            <!-- TITLE -->            
+                            <div class="flex flex-col min-w-0 shrink-0">            
+                                <p class="text-slate-900 dark:text-white text-sm md:text-xs lg:text-sm xl:text-base whitespace-nowrap">Settings</p>            
+                                <p class="hidden lg:block text-slate-500 dark:text-slate-400 text-xs mt-2 whitespace-nowrap">Manage your preferences and application settings</p>            
+                            </div>
+            <!-- SEARCH -->            
+                            <div class="relative flex items-center w-32 md:w-36 lg:w-64 xl:w-96 h-9 lg:h-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-950 mx-1 lg:mx-3 min-w-0">            
+                                <i data-lucide="search" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-400 ml-2 lg:ml-3 shrink-0"></i>            
+                                <input type="text" name="searchbar" id="searchbar" placeholder="Search..." class="flex-1 min-w-0 bg-transparent outline-none border-none px-2 lg:px-3 text-slate-900 dark:text-white text-xs lg:text-sm rounded-lg">            
+                                <span class="hidden lg:block text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded mr-2 px-2 py-1">⌘ K</span>            
+                            </div>
+            <!-- RIGHT SIDE -->            
+                            <div class="flex items-center gap-2 md:gap-3 lg:gap-5 shrink-0">            
+                                <div class="relative">            
+                                    <button id="notificationBtn" class="relative p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition">            
+                                    <i data-lucide="bell" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-600 dark:text-slate-300"></i>            
+                                    <span id="notificationCount" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center">3</span>            
+                                </button>            
+                                </div>
+            
+            <!-- Notification Dropdown -->            
+                <div id="notificationDropdown"            
+                class="hidden absolute right-0 top-10 w-72 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl shadow-xl z-50">            
+               <div class="px-4 py-3 border-b border-slate-300 dark:border-slate-700">            
+                   <p class="text-slate-900 dark:text-white text-sm font-semibold">Notifications</p>            
+                   <p class="text-slate-500 text-xs mt-1">Recent security activity</p>            
+               </div>
+            
+               <div id="notificationList" class="p-2"></div>
+            
+               <div class="border-t border-slate-300 dark:border-slate-700 px-4 py-3">            
+                   <button class="text-blue-500 dark:text-blue-400 text-xs hover:text-blue-300">            
+                       View all notifications            
+                   </button>            
+               </div>            
+            </div>
+             
+                <button id="brightBtn" class="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 transition">            
+                    <i data-lucide="sun" class="w-4 h-4 lg:w-5 lg:h-5"></i>            
+                </button>            
+            <!-- PROFILE -->            
+                                <div class="relative">            
+                                    <button id="profilebtn" class="flex items-center gap-1 md:gap-2 lg:gap-3 px-1 md:px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">            
+                                        <div class="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-blue-600 flex items-center justify-center">            
+                                            <i data-lucide="user" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-300"></i>            
+                                        </div>
+            
+                                        <div class="hidden lg:flex flex-col items-start">            
+                                            <p class="text-slate-900 dark:text-white text-sm font-semibold"> Hania</p>            
+                                            <p class="text-slate-500 dark:text-slate-400 text-xs"> Admin</p>            
+                                        </div>            
+                                        <i data-lucide="chevron-down" class="w-3 h-3 lg:w-4 lg:h-4 text-slate-500 dark:text-slate-400"></i>            
+                                    </button>            
+            <!-- Dropdown -->            
+                                    <div id="profileDropdown" class="hidden absolute right-0 top-14 w-52 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl shadow-xl p-2 z-50">            
+                                        <div class="px-3 py-2 border-b border-slate-300 dark:border-slate-700 mb-2">            
+                                            <p class="text-slate-900 dark:text-white text-sm font-semibold">Hania</p>            
+                                            <p class="text-slate-500 dark:text-slate-400 text-xs">Admin</p>            
+                                        </div>
+            
+                                        <a href="Settings.html#profileSection" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">            
+                                            <i data-lucide="user" class="w-4 h-4"></i>            
+                                            <span class="text-sm">Profile</span>            
+                                        </a>
+            
+                                        <a href="Settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">            
+                                            <i data-lucide="settings" class="w-4 h-4"></i>            
+                                            <span class="text-sm">Settings</span>            
+                                        </a>
+            
+                                        <a href="Logout.html" id="logoutBtn" class="flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10">            
+                                            <i data-lucide="log-out" class="w-4 h-4"></i>            
+                                            <span class="text-sm">Logout</span>            
+                                        </a>            
+                                    </div>            
+                                </div>            
+                            </div>            
+                        </div>
+                        <hr class="border-slate-200 dark:border-slate-800">
+
+
+           <!-- Main content -->
+           <div class="bg-white dark:bg-slate-950 min-h-screen px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8 pt-3 sm:pt-4 pb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+<!-- 1. LEFT SETTINGS NAVIGATION -->
+            <div class="lg:col-span-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 lg:min-h-[680px] h-fit">
+
+<!-- Profile -->
+        <button type="button" data-setting="profile" class="settingNav w-full flex gap-4 items-center px-3 py-3 rounded-lg bg-blue-500/10 text-left">
+        <i data-lucide="user-round" class="w-5 h-5 text-blue-500"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90">Profile</p>
+            <p class="text-xs text-slate-500">Manage your profile information</p>
+        </div>
+        </button>
+
+<!-- Notification -->
+        <button type="button" data-setting="notifications" class="settingNav w-full flex items-center gap-4 px-3 py-3 rounded-lg text-left">
+        <i data-lucide="bell" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90"> Notifications</p>
+            <p class="text-xs text-slate-500"> Configure email and system alerts</p>
+        </div>
+        </button>
+
+<!-- Appearance -->
+        <button type="button" data-setting="appearance" class="settingNav w-full flex items-center gap-4 px-3 py-3 rounded-lg text-left">
+        <i data-lucide="palette" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90">Appearance</p>
+            <p class="text-xs text-slate-500">Customize theme and display</p>
+        </div>
+        </button>
+
+<!-- API Configuration -->
+        <button type="button" data-setting="api" class="settingNav w-full flex items-center gap-4 px-3 py-3 rounded-lg text-left">
+        <i data-lucide="code-2" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90">API Configuration</p>
+            <p class="text-xs text-slate-500">Manage API keys and integrations</p>
+        </div>
+        </button>
+
+<!-- Security -->
+        <button type="button" data-setting="security" class="settingNav w-full flex items-center gap-4 px-3 py-3 rounded-lg text-left">
+        <i data-lucide="shield" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90">Security</p>
+            <p class="text-xs text-slate-500">Password and 2FA settings</p>
+        </div>
+        </button>
+
+<!-- Data & Privacy -->
+        <button type="button" data-setting="dataPrivacy" class="settingNav w-full flex items-center gap-4 px-3 py-3 rounded-lg text-left">
+        <i data-lucide="database" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90">Data & Privacy</p>
+            <p class="text-xs text-slate-500">Manage your data and privacy</p>
+        </div>
+        </button>    
+
+<!-- About -->
+        <button type="button" data-setting="about" class="settingNav w-full flex items-center gap-4 px-3 py-3 rounded-lg text-left">
+        <i data-lucide="circle-info" class="w-5 h-5 text-slate-500 dark:text-slate-400"></i>
+        <div>
+            <p class="text-sm font-medium text-slate-900 dark:text-white/90">About</p>
+            <p class="text-xs text-slate-500">About AI Security Copilot</p>
+        </div>
+        </button>
+</div>
+
+<!-- RIGHT SIDE -->
+            <div class="lg:col-span-9 space-y-5">
+
+<!-- 2. PROFILE INFORMATION -->
+        <div id="profileSection" class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 min-h-[275px]">
+            <h2 class="text-slate-900 dark:text-white/85 font-semibold text-lg">Profile Information</h2>
+            <p class="text-slate-600 dark:text-white/60 text-sm mt-1">Update your personal information and account details</p>
+        <div class="flex flex-col sm:flex-row gap-6 mt-6">
+            <div class="flex justify-center sm:justify-start shrink-0">
+            <div id="profilePicContainer" class="relative w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center mt-2">
+                <img  id="profilePic" src="" class="hidden w-full h-full object-cover rounded-full">
+                <i id="defaultProfileIcon" data-lucide="user-round" class="w-8 h-8 text-white"></i>
+
+<!-- Edit icon -->
+        <button id="editProfilePicBtn" type="button" class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border border-blue-500 flex items-center justify-center hover:bg-slate-100 transition-colors">
+        <i data-lucide="pencil" class="w-3 h-3 text-blue-500"></i>
+        </button>
+        <input  id="profilePicInput"  type="file"  accept="image/*"  class="hidden">
+         </div>
+    </div>
+
+<!-- Form -->
+    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+<!-- Name -->
+        <div>
+            <label for="name" class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Full Name</label>
+            <input id="name" type="text" name="fullname" placeholder="Full Name" class="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-500 dark:placeholder:text-slate-600 outline-none caret-blue-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-colors">
+        </div>
+
+<!-- Email -->
+        <div>
+            <label for="email" class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Email Address</label>
+        <input type="email" name="email" id="email" placeholder="Email Address" class=" w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-500 dark:placeholder:text-slate-600 outline-none caret-blue-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-colors">
+    </div>
+
+<!-- Username -->
+        <div>
+            <label for="username" class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Username</label>
+            <input id="username" type="text" name="username" placeholder="Username" class="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-500 dark:placeholder:text-slate-600 outline-none caret-blue-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-colors">
+    </div>
+
+<!-- Role -->
+        <div>
+            <label for="rol" class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Role</label>
+            <input id="role" type="text" name="role" placeholder="Username" class="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-500 dark:placeholder:text-slate-600 outline-none caret-blue-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-colors">
+        </div>
+    </div>
+</div>
+
+<!-- Save Button -->
+                <div class="flex justify-end mt-5">
+                    <button id="saveChangesBtn" type="button" class="flex items-center gap-2  px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-500 shadow-lg shadow-blue-600/20 transition-colors">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        Save Changes
+                    </button>
+                </div>
+                </div>
+
+<!-- 3, 4, 5. THREE SETTINGS CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+<!-- NOTIFICATIONS -->
+    <div id="notificationsSection" class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 min-h-[275px]">
+        <div class="mb-5">
+        <h2 class="text-slate-900 dark:text-white/85 font-semibold text-lg">Notifications</h2>
+        <p class="text-slate-600 dark:text-white/60 text-sm mt-1">Control how you recieve notifications and alert</p>
+        </div>
+
+<!-- Notification option -->
+        <div class="space-y-4">
+
+<!--Email notification  -->
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <p class="text-xs font-medium text-slate-900 dark:text-white/85">Email Notification</p>
+                <p class="text-[11px] text-slate-500 mt-1">Receive email alerts for important events</p>
+            </div>
+
+            <button id="emailNotifBtn" type="button" class="notification-toggle relative w-9 h-5 rounded-full bg-blue-600 shrink-0">
+                <span id="emailNotifCircle" class="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white"></span>
+            </button>
+        </div>
+
+<!-- Security alert -->
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <p class="text-xs font-medium text-slate-900 dark:text-white/85">Security Alerts</p>
+            <p class="text-[11px] text-slate-500 mt-1">Get notified about critical vulnerabilities</p>
+        </div>
+
+        <button id="securityAlertBtn" type="button" class="notification-toggle relative w-9 h-5 rounded-full bg-blue-600 shrink-0">
+            <span id="securityAlertCircle" class="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white"></span>
+        </button>
+        </div>
+
+<!-- weekly reports -->
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <p class="text-xs font-medium text-slate-900 dark:text-white/85">Weekly Reports</p>
+                <p class="text-[11px] text-slate-500 mt-1">Receive weekly summary reports</p>
+            </div>
+
+            <button id="reportsBtn" type="button" class="notification-toggle relative w-9 h-5 rounded-full bg-blue-600 shrink-0">
+                <span id="reportsCircle" class="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white"></span>
+            </button>
+            </div>
+
+<!-- Product updates -->
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <p class="text-xs font-medium text-slate-900 dark:text-white/85"> Product Updates</p>
+                <p class="text-[11px] text-slate-500 mt-1">Get notified about new features</p>
+            </div>
+
+            <button id="updatesBtn" type="button" class="notification-toggle relative w-9 h-5 rounded-full bg-blue-600 shrink-0">
+                <span id="updatesCircle" class="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white"></span>
+            </button>
+            </div>
+        </div>
+<!-- Bottom Button -->
+
+</div>
+
+<!-- APPEARANCE -->
+          <div id="appearanceSection" class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 min-h-[275px]">
+            <div class="mb-5">
+                <h2 class="text-slate-900 dark:text-white/85 font-semibold text-lg">Appearance</h2>
+                <p class="text-slate-600 dark:text-white/60 text-sm mt-1">Customize how the application looks for you.</p>
+
+        </div>
+
+            <!-- Theme -->
+            <div class="mb-5">
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Theme</p>
+                <div class="grid grid-cols-3 gap-2">
+
+                <!-- Light -->
+                     <button id="lightThemeBtn" type="button" class="themeBtn flex flex-col items-center justify-center gap-1.5 h-14 rounded-lg border border-blue-500 bg-blue-500/5 text-blue-500 dark:text-blue-400">
+                        <i data-lucide="sun" class="w-4 h-4"></i>
+                        <span class="text-[11px] font-medium">Light</span>
+                     </button>
+
+                <!-- dark -->
+                     <button id="darkThemeBtn" type="button" class="themeBtn flex flex-col items-center justify-center gap-1.5 h-14 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600 transition-colors">
+                        <i data-lucide="moon" class="w-4 h-4"></i>
+                        <span class="text-[11px] font-medium">Dark</span>
+                     </button>
+
+                <!-- System -->
+                     <button id="systemThemeBtn" type="button" class="themeBtn flex flex-col items-center justify-center gap-1.5 h-14 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600 transition-colors">
+                        <i data-lucide="monitor" class="w-4 h-4"></i>
+                        <span class="text-[11px] font-medium">System</span>
+                     </button>
+                </div>
+                </div>
+
+                <!-- Primary Color -->
+                 <div class="mb-5">
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Primary Color</p>
+                    <div class="flex items-center gap-4 flex-wrap">
+
+                <!-- Purple -->
+                         <button type="button" class="primaryColorBtn w-7 h-7 rounded-full bg-violet-500  ring-violet-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900"></button>
+
+                <!-- Blue -->
+                         <button type="button" class="primaryColorBtn w-7 h-7 rounded-full bg-blue-500  hover:scale-110  ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-blue-400 transition-transform"></button>
+
+                <!-- Green -->
+                         <button type="button" class="primaryColorBtn w-7 h-7 rounded-full bg-emerald-500  hover:scale-110 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-emerald-400 transition-transform"></button>
+
+                <!-- Orange -->
+                         <button type="button" class="primaryColorBtn w-7 h-7 rounded-full bg-orange-500  hover:scale-110 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-orange-400 transition-transform"></button>
+
+                <!-- Red -->
+                         <button type="button" class="primaryColorBtn w-7 h-7 rounded-full bg-red-500  hover:scale-110 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-red-400 transition-transform"></button>
+
+                <!-- Pink -->
+                         <button type="button" class="primaryColorBtn w-7 h-7 rounded-full bg-pink-500  hover:scale-110 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 ring-pink-400 transition-transform"></button>
+                    </div>
+                </div>
+
+            <!-- Font size -->
+                <div class="mb-5">
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Font size</p>
+                    <div class="grid grid-cols-3 gap-2">
+
+            <!-- Small -->
+            <button id="smallFontBtn" type="button" class="h-9 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-[11px] hover:border-slate-400 dark:hover:border-slate-600 transition-colors">Small</button>
+
+            <!-- Medium -->
+            <button id="mediumFontBtn" type="button" class="h-9 rounded-lg border border-blue-500 text-blue-500 dark:text-blue-400 text-[11px] bg-blue-500/5">Medium</button>
+
+            <!-- Large -->
+            <button id="largeFontBtn" type="button" class="h-9 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-[11px] hover:border-slate-400 dark:hover:border-slate-600 transition-colors">Large</button>
+        </div>
+        </div>
+
+            <!-- Reset Button -->
+                     <button type="button" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-blue-500/40 text-blue-500 dark:text-blue-400 text-xs font-medium hover:bg-blue-500/10 transition-colors">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        Reset to Default
+                     </button>
+                     </div>
+
+            <!-- SECURITY -->
+                <div id="securitySection" class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 min-h-[275px]">
+                    <div class="mb-5">
+                        <h2 class="text-slate-900 dark:text-white/85 font-semibold text-lg">Security</h2>
+                        <p class="text-slate-600 dark:text-white/60 text-sm mt-1"> Manage your account security settings</p>
+                    </div>
+
+                <!-- Security options -->
+                    <div class="space-y-4">
+
+                <!-- Change password -->
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <i data-lucide="lock-keyhole" class="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0"></i>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-medium text-slate-900 dark:text-white/85">Change password</p>
+                                    <p class="text-[11px] text-slate-500 mt-1">Update your account password</p>
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 shrink-0"></i>
+                        </div>
+
+                <!-- Two-Factor Authentication -->
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <i data-lucide="shield-check" class="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0"></i>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-medium text-slate-900 dark:text-white/85">Two-Factor Authentiaction</p>
+                                    <p class="text-[11px] text-slate-500 mt-1">Add an extra layer of security</p>
+                                </div>
+                            </div>
+                            <span id="twoFactorStatus" class="shrink-0 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 text-[10px] font-medium">Enabled</span>
+                       </div>
+
+                <!-- Active session -->
+                       <div class="flex items-center justify-between gap-4">
+                       <div class="flex items-center gap-3 min-w-0">
+                           <i data-lucide="monitor-smartphone" class="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0"></i>
+                           <div class="min-w-0">
+                               <p class="text-xs font-medium text-slate-900 dark:text-white/85">Active Sessions</p>
+                               <p class="text-[11px] text-slate-500 mt-1">Manage your active sessions</p>
+                           </div>
+                       </div>
+                       <span id="activeSessionsCount" class="shrink-0 w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] text-slate-500 dark:text-slate-400">0</span>
+                  </div>
+
+            <!-- Login history -->
+                  <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <i data-lucide="history" class="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0"></i>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-slate-900 dark:text-white/85">Login History</p>
+                            <p class="text-[11px] text-slate-500 mt-1">View your recent login activity</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 shrink-0"></i>
+               </div>
+            </div>
+
+            <!-- Security Setting button -->
+             <button id="securitySettingsBtn" type="button"class="w-full mt-5 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-blue-500/40 text-blue-500 dark:text-blue-400 text-xs font-medium hover:bg-blue-500/10 transition-colors" >
+                <i data-lucide="shield" class="w-4 h-4"></i>
+                Security Settings
+             </button>
+             </div>
+             </div>
+
+             <!-- Security Settings Modal -->
+
+<div id="securityModal"
+class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+<!-- Overlay -->
+<div id="securityModalOverlay"
+    class="absolute inset-0 bg-black/50 backdrop-blur-sm">
+</div>
+
+<!-- Modal -->
+<div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
+
+   <!-- Header -->
+   <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+
+       <div>
+           <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+               Security Settings
+           </h2>
+
+           <p class="text-[11px] text-slate-500 mt-1">
+               Manage your account security
+           </p>
+       </div>
+
+       <button id="closeSecurityModal"
+               type="button"
+               class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+
+           <i data-lucide="x" class="w-4 h-4"></i>
+
+       </button>
+
+   </div>
+
+
+   <!-- Security Options -->
+   <div class="p-5 space-y-3">
+
+       <!-- Change Password -->
+       <button id="changePasswordBtn"
+               type="button"
+               class="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left">
+
+           <div class="flex items-center gap-3">
+
+               <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+
+                   <i data-lucide="lock-keyhole"
+                      class="w-4 h-4 text-slate-500 dark:text-slate-400">
+                   </i>
+
+               </div>
+
+               <div>
+
+                   <p class="text-xs font-medium text-slate-900 dark:text-white/90">
+                       Change Password
+                   </p>
+
+                   <p class="text-[10px] text-slate-500 mt-1">
+                       Update your account password
+                   </p>
+
+               </div>
+
+           </div>
+
+           <i data-lucide="chevron-right"
+              class="w-4 h-4 text-slate-400">
+           </i>
+
+       </button>
+
+
+       <!-- Two Factor -->
+       <button id="twoFactorBtn" class="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+
+           <div class="flex items-center gap-3">
+
+               <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+
+                   <i data-lucide="shield-check"
+                      class="w-4 h-4 text-emerald-500">
+                   </i>
+
+               </div>
+
+               <div>
+
+                   <p class="text-xs font-medium text-slate-900 dark:text-white/90">
+                       Two-Factor Authentication
+                   </p>
+
+                   <p class="text-[10px] text-slate-500 mt-1">
+                       Add an extra layer of security
+                   </p>
+
+               </div>
+
+            </div>
+
+           <span id="modalTwoFactorStatus" class="px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 text-[10px] font-medium">
+               Enabled
+           </span>
+
+        </button>
+
+
+       <!-- Active Sessions -->
+       <button id="activeSessionsBtn"
+               type="button"
+               class="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left">
+
+           <div class="flex items-center gap-3">
+
+               <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+
+                   <i data-lucide="monitor-smartphone"
+                      class="w-4 h-4 text-slate-500 dark:text-slate-400">
+                   </i>
+
+               </div>
+
+               <div>
+
+                   <p class="text-xs font-medium text-slate-900 dark:text-white/90">
+                       Active Sessions
+                   </p>
+
+                   <p class="text-[10px] text-slate-500 mt-1">
+                       Manage your active sessions
+                   </p>
+
+               </div>
+
+           </div>
+
+           <span id="modalActiveSessionsCount" class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] text-slate-500">
+               0
+           </span>
+
+       </button>
+
+
+       <!-- Login History -->
+       <button id="loginHistoryBtn"
+               type="button"
+               class="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left">
+
+           <div class="flex items-center gap-3">
+
+               <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+
+                   <i data-lucide="history"
+                      class="w-4 h-4 text-slate-500 dark:text-slate-400">
+                   </i>
+
+               </div>
+
+               <div>
+
+                   <p class="text-xs font-medium text-slate-900 dark:text-white/90">
+                       Login History
+                   </p>
+
+                   <p class="text-[10px] text-slate-500 mt-1">
+                       View your recent login activity
+                   </p>
+
+               </div>
+
+           </div>
+
+           <i data-lucide="chevron-right"
+              class="w-4 h-4 text-slate-400">
+           </i>
+
+       </button>
+
+   </div>
+
+</div>
+
+</div>
+
+
+            <!-- LARGE API CONFIGURATION BOX -->
+            <div id="apiSection" class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+
+            <!-- Heading -->
+                    <div>
+                        <h2 class="text-slate-900 dark:text-white/85 font-semibold text-lg">API Configuration</h2>
+                        <p class="text-slate-600 dark:text-white/60 text-sm mt-1">Manage your API keys and external service integrations.</p>
+                    </div>
+
+            <!-- Manage API Key -->
+                    <button id="manageApiKeyBtn" type="button" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-blue-500/40 text-blue-500 dark:text-blue-400 text-xs font-medium hover:bg-blue-500/10 transition-colors">
+                        <i data-lucide="key-round" class="w-4 h-4"></i>
+                         Manage API keys
+                    </button>
+                </div>
+
+                <!-- API Key Modal -->
+
+<div id="apiKeyModal"
+class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+<!-- Overlay -->
+<div id="apiKeyOverlay"
+    class="absolute inset-0 bg-black/50 backdrop-blur-sm">
+</div>
+
+<!-- Modal -->
+<div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
+
+   <!-- Header -->
+   <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+
+       <div>
+           <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+               Manage API Key
+           </h2>
+
+           <p class="text-[11px] text-slate-500 mt-1">
+               Manage your API authentication key
+           </p>
+       </div>
+
+       <button
+           id="closeApiKeyModal"
+           type="button"
+           class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+       >
+           <i data-lucide="x" class="w-4 h-4"></i>
+       </button>
+
+   </div>
+
+
+   <!-- Content -->
+   <div class="p-5 space-y-4">
+
+       <div>
+
+           <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
+               API Key
+           </label>
+
+           <div class="flex gap-2">
+
+               <input
+                   id="apiKeyInput"
+                   type="password"
+                   value=""
+                   readonly
+                   class="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none"
+               >
+
+               <button
+                   id="toggleApiKey"
+                   type="button"
+                   class="px-3 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+               >
+                   <i data-lucide="eye" class="w-4 h-4"></i>
+               </button>
+
+           </div>
+
+       </div>
+
+
+       <div class="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+
+           <i data-lucide="triangle-alert"
+              class="w-4 h-4 text-amber-500 shrink-0 mt-0.5">
+           </i>
+
+           <p class="text-[10px] text-amber-600 dark:text-amber-400">
+               Keep your API key private. Never share it publicly or commit it to source control.
+           </p>
+
+       </div>
+
+
+       <div class="flex gap-3 pt-2">
+
+           <button
+               id="regenerateApiKeyBtn"
+               type="button"
+               class="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+           >
+               Regenerate
+           </button>
+
+           <button
+               id="closeApiKeyBtn"
+               type="button"
+               class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700"
+           >
+               Done
+           </button>
+       </div>
+   </div>
+</div>
+</div>
+
+            <!-- INTEGRATIONS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+               <!-- OpenAI -->
+                    <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/40">
+                        <div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                            <i data-lucide="bot" class="w-5 h-5 text-emerald-500 dark:text-emerald-400"></i>
+                        </div>
+
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-slate-900 dark:text-white/85 truncate">OpenAI API</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                <span class="text-[10px] text-emerald-500 dark:text-emerald-400">Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                   <!-- Google Cloud -->
+                   <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/40">
+                    <div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                        <i data-lucide="cloud" class="w-5 h-5 text-blue-500 dark:text-blue-400"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium text-slate-900 dark:text-white/85 truncate">Google Cloud</p>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-[10px] text-emerald-500 dark:text-emerald-400">Connected</span>
+                        </div>
+                    </div>
+                </div>
+
+              <!-- Threat Intelligence -->
+                <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/40">
+                    <div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                        <i data-lucide="globe-2" class="w-5 h-5 text-blue-500 dark:text-blue-400"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium text-slate-900 dark:text-white/85 truncate">Threat Intelligence</p>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-[10px] text-emerald-500 dark:text-emerald-400">Connected</span>
+                        </div>
+                    </div>
+                </div>
+
+             <!-- VirusTotal -->
+                <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/40">
+                    <div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                        <i data-lucide="scan-line" class="w-5 h-5 text-violet-500 dark:text-violet-400"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium text-slate-900 dark:text-white/85 truncate">Virus Total</p>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-[10px] text-emerald-500 dark:text-emerald-400">Connected</span>
+                        </div>
+                    </div>
+                </div>
+
+              <!-- Add Integration -->
+              <div
+              id="dynamicIntegrations"
+              class="contents">
+          </div>
+                <button id="addIntegrationBtn" type="button" class="flex items-center gap-3 p-3 rounded-lg border border-dashed border-blue-500/50 hover:bg-blue-500/5 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                        <i data-lucide="plus" class="w-5 h-5 text-blue-500 dark:text-blue-400"></i>
+                    </div>
+
+                    <div class="text-left min-w-0">
+                        <p class="text-xs font-medium text-blue-500 dark:text-blue-400 truncate">Add Integration</p>
+                        <p class="text-[10px] text-slate-500 mt-1 truncate">Connect a new service</p>
+                    </div>
+                </button>
+
+                <!-- Add Integration Modal -->
+
+<div id="integrationModal"
+class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+<!-- Overlay -->
+<div id="integrationOverlay"
+    class="absolute inset-0 bg-black/50 backdrop-blur-sm">
+</div>
+
+<!-- Modal -->
+<div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
+
+   <!-- Header -->
+   <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+
+       <div>
+
+           <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+               Add Integration
+           </h2>
+
+           <p class="text-[11px] text-slate-500 mt-1">
+               Connect a new service to your account
+           </p>
+
+       </div>
+
+       <button
+           id="closeIntegrationModal"
+           type="button"
+           class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+       >
+           <i data-lucide="x" class="w-4 h-4"></i>
+       </button>
+
+   </div>
+
+
+   <!-- Content -->
+   <div class="p-5 space-y-4">
+
+       <!-- Service -->
+       <div>
+
+           <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
+               Service
+           </label>
+
+           <select
+               id="integrationType"
+               class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500"
+           >
+
+               <option value="">
+                   Select a service
+               </option>
+
+               <option value="github">
+                   GitHub
+               </option>
+
+               <option value="jira">
+                   Jira
+               </option>
+
+               <option value="slack">
+                   Slack
+               </option>
+
+               <option value="splunk">
+                   Splunk
+               </option>
+
+           </select>
+
+       </div>
+
+
+       <!-- API Token -->
+       <div>
+
+           <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
+               API Token
+           </label>
+
+           <input
+               id="integrationToken"
+               type="password"
+               placeholder="Enter API token"
+               class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500"
+           >
+
+       </div>
+
+
+       <!-- Buttons -->
+       <div class="flex gap-3 pt-2">
+
+           <button
+               id="cancelIntegrationBtn"
+               type="button"
+               class="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+           >
+               Cancel
+           </button>
+
+           <button
+               id="saveIntegrationBtn"
+               type="button"
+               class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700"
+           >
+               Add Integration
+           </button>
+
+       </div>
+
+   </div>
+
+</div>
+
+</div>
+            </div>
+        </div>
+        </div> 
+
+<!-- Active Sessions Modal -->
+<div id="activeSessionsModal"
+class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+<!-- Overlay -->
+<div id="activeSessionsOverlay"
+    class="absolute inset-0 bg-black/50 backdrop-blur-sm">
+</div>
+
+<!-- Modal -->
+<div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
+
+   <!-- Header -->
+   <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+       <div>
+           <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+               Active Sessions
+           </h2>
+
+           <p class="text-[11px] text-slate-500 mt-1">
+               Manage devices currently signed in
+           </p>
+       </div>
+
+       <button id="closeActiveSessionsModal"
+               type="button"
+               class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+
+           <i data-lucide="x" class="w-4 h-4"></i>
+
+       </button>
+
+   </div>
+
+   <!-- Sessions -->
+   <div id="sessionsContainer"
+        class="p-5 space-y-3">
+
+       <!-- Sessions will be loaded here -->
+   </div>
+</div>
+</div>
+
+<!-- Login History Modal -->
+
+<div id="loginHistoryModal"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+
+    <!-- Overlay -->
+
+    <div id="loginHistoryOverlay"
+         class="absolute inset-0 bg-black/50 backdrop-blur-sm">
+    </div>
+
+    <!-- Modal -->
+
+    <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
+        <!-- Header -->
+
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700">
+            <div>
+                <h2 class="text-sm font-semibold text-slate-900 dark:text-white">
+                    Login History
+                </h2>
+
+                <p class="text-[11px] text-slate-500 mt-1">
+                    View your recent login activity
+                </p>
+            </div>
+            <button id="closeLoginHistoryModal"
+                    type="button"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Login History -->
+        <div id="loginHistoryContainer" class="p-5 space-y-3">
+            <!-- Login history will load here -->
+        </div>
+    </div>
+</div>
+
+    </main>
+
+
+
+
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="js/config.js"></script>
+        <script src="js/theme.js"></script>
+        <script src="js/script.js"></script>
+        <script src="js/Settings.js"></script>
+</body>
+</html>

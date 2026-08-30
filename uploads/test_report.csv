@@ -1,0 +1,6 @@
+Finding,Severity,Endpoint,Description,Recommendation
+SQL Injection,Critical,/api/users,User input may be included directly in database queries,Use parameterized queries
+Cross-Site Scripting,High,/search,Search input is reflected without adequate encoding,Apply context-aware output encoding
+Missing Security Headers,Medium,/,Recommended security headers are missing,Configure appropriate HTTP security headers
+Weak Password Policy,Medium,/login,Weak passwords are accepted,Enforce a stronger password policy
+Information Disclosure,Low,/api/status,Server version information is exposed,Remove unnecessary version information

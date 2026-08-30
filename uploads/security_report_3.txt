@@ -1,0 +1,63 @@
+FINDING 001
+Title: SQL Injection
+Severity: Critical
+Affected Endpoint: /api/users
+Description: User-controlled input reaches a database query without sufficient parameterization.
+Evidence: SQL metacharacters alter the database query behavior.
+Recommendation: Use parameterized queries.
+
+FINDING 002
+Title: Authentication Bypass
+Severity: Critical
+Affected Endpoint: /api/admin
+Description: Authentication checks can be bypassed under certain conditions.
+Evidence: Restricted endpoint returned data without valid authentication.
+Recommendation: Enforce authentication and authorization server-side.
+
+FINDING 003
+Title: Cross-Site Scripting (XSS)
+Severity: High
+Affected Endpoint: /search
+Description: Reflected input is returned without adequate encoding.
+Evidence: HTML payloads are reflected in the response.
+Recommendation: Apply contextual output encoding.
+
+FINDING 004
+Title: Insecure Direct Object Reference
+Severity: High
+Affected Endpoint: /api/orders
+Description: Object identifiers can be modified to access another user's data.
+Evidence: Changing the order identifier returned another record.
+Recommendation: Verify object ownership on every request.
+
+FINDING 005
+Title: Missing Security Headers
+Severity: Medium
+Affected Endpoint: /
+Description: Several recommended security headers are missing.
+Evidence: Headers such as Content-Security-Policy are absent.
+Recommendation: Configure recommended HTTP security headers.
+
+FINDING 006
+Title: Weak Password Policy
+Severity: Medium
+Affected Endpoint: /register
+Description: Password requirements are insufficient.
+Evidence: Weak passwords were accepted during registration.
+Recommendation: Enforce stronger password requirements.
+
+FINDING 007
+Title: Verbose Error Messages
+Severity: Low
+Affected Endpoint: /api/orders
+Description: Error responses reveal unnecessary internal information.
+Evidence: Stack and implementation details appeared in responses.
+Recommendation: Return generic error messages.
+
+FINDING 008
+Title: Information Disclosure
+Severity: Low
+Affected Endpoint: /api/status
+Description: Detailed software version information is exposed.
+Evidence: Server version data is present in the API response.
+Recommendation: Remove unnecessary version information.

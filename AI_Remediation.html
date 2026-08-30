@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Security Copilot-Dashbaord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="font-[Inter] overflow-x-hidden bg-white dark:bg-slate-950">
+    <!-- MOBILE HEADER-->
+        <header class="md:hidden sticky top-0 z-30 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+            <div class="h-14 px-3 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <img src="assets/logo/logo.png" alt="AI Security Copilot Logo" class="w-8 h-8 shrink-0">
+                    <p class="text-slate-900 dark:text-white font-bold text-[13px] truncate">
+                        <span class="text-blue-500">AI</span> Security Copilot
+                    </p>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                    <button id="mobileMenuBtn" class="text-slate-900 dark:text-white text-2xl p-2" aria-label="Open menu">☰</button>
+                </div>
+            </div>
+        </header>
+
+
+ <!-- MOBILE DRAWER-->
+ <div id="mobileOverlay" class="hidden fixed inset-0 bg-black/60 z-40"></div>
+ <aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] -translate-x-full transition-transform duration-300 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto md:hidden">
+     <div class="flex items-center justify-between mb-8">
+         <div class="flex items-center gap-3">
+             <img alt="AI Security Copilot Logo" class="w-10 h-10" src="assets/logo/logo.png"/>
+             <p class="text-slate-900 dark:text-white font-bold text-base leading-tight">
+                 <span class="text-blue-500">AI</span> Security<br/>Copilot
+             </p>
+         </div>
+         <button aria-label="Close menu" class="text-slate-700 dark:text-slate-300 text-2xl p-2" id="mobileCloseBtn"> × </button>
+     </div>
+     <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3"> Main </p>
+
+     <nav class="space-y-2">
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="dashaboard.html">
+             <i class="w-5 h-5" data-lucide="layout-dashboard"></i>
+             <span class="font-medium text-sm">Dashboard</span>
+         </a>
+
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="AnalyzeReport.html">
+             <i class="w-5 h-5" data-lucide="file-search"></i>
+             <span class="text-sm font-medium">Analyze Report</span>
+         </a>
+
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Findings.html">
+             <i class="w-5 h-5" data-lucide="shield-alert"></i>
+             <span class="text-sm font-medium">Findings</span>
+         </a>
+
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400" href="AI_Remediation.html">
+             <i class="w-5 h-5" data-lucide="sparkles"></i>
+             <span class="text-sm font-medium">AI Remediation</span>
+         </a>
+
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="History.html">
+             <i class="w-5 h-5" data-lucide="history"></i>
+             <span class="text-sm font-medium">History</span>
+         </a>
+     </nav>
+
+<!-- System -->
+     <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-8 mb-3">System</p>
+     <nav class="space-y-2">
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Settings.html">
+             <i class="w-5 h-5" data-lucide="settings"></i>
+             <span class="text-sm font-medium">Settings</span>
+         </a>
+
+         <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Logout.html">
+             <i class="w-5 h-5" data-lucide="log-out"></i>
+             <span class="text-sm font-medium">Logout</span>
+         </a>
+     </nav>
+ </aside>
+
+    <!-- DESKTOP LAYOUT -->
+   <div class="flex min-h-screen">
+    <!-- DESKTOP SIDEBAR-->
+            <aside class="hidden md:flex sticky w-64 flex-shrink-0 flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800">
+    <!-- LOGO -->
+                <div class="px-4 pt-4">
+                    <div class="flex items-center gap-3">
+                        <img src="assets/logo/logo.png" alt="AI Security Copilot Logo" class="w-12 h-12">
+                        <p class="text-slate-900 dark:text-white font-bold text-lg leading-tight">
+                            <span class="text-blue-500">AI</span> Security<br>Copilot
+                        </p>
+                    </div>
+    <!-- Tagline -->
+                    <p class="text-[12px] leading-4 text-slate-500 dark:text-slate-400 mt-2 px-4 whitespace-nowrap"> Smart Analysis<br> Stronger Security</p>
+                </div>
+    <!-- Navigation -->
+                <nav class="mt-8 px-4 flex-1 flex flex-col">
+                    <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-3"> Main</p>
+                    <div class="space-y-2">
+                        <a href="dashboard.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            <span class="font-medium text-sm">Dashboard</span>
+                        </a>
+
+                        <a href="AnalyzeReport" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                            <i data-lucide="file-search" class="w-5 h-5"></i>
+                            <span class="text-sm font-medium">Analyze Report</span>
+                        </a>
+
+                        <a href="Findings.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                            <span class="text-sm font-medium">Findings</span>
+                        </a>
+
+                        <a href="AI_Remediation.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            <span class="text-sm font-medium">AI Remediation</span>
+                        </a>
+
+                        <a href="History.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                            <i data-lucide="history" class="w-5 h-5"></i>
+                            <span class="text-sm font-medium">History</span>
+                        </a>
+                    </div>
+
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-8 mb-3"> System</p>
+                    <a href="settings.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span class="text-sm font-medium">Settings</span>
+                    </a>
+
+                    <a href="Logout.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </nav>
+            </aside>
+
+<!-- MAIN -->
+<main class="flex-1 min-w-0">
+    <!-- TOPBAR -->
+    <div id="desktopTopbar" class="hidden md:flex bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-20 justify-between items-center px-3 md:px-4 lg:px-6 xl:px-8 gap-2 lg:gap-4">
+    
+        <!-- TITLE -->
+     <div class="flex gap-3 items-center">
+    <div class="flex flex-col min-w-0 shrink-0">
+        <p class="text-slate-900 dark:text-white text-sm md:text-xs lg:text-sm xl:text-base whitespace-nowrap">AI Remediation</p>
+        <p class="hidden lg:block text-slate-500 dark:text-slate-400 text-xs mt-2 whitespace-nowrap">Get AI powered recommendations and fix vulnerabilities faster</p>
+    </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="relative flex items-center w-32 md:w-36 lg:w-64 xl:w-96 h-9 lg:h-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-950 mx-1 lg:mx-3 min-w-0">
+        <i data-lucide="search" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-500 dark:text-slate-400 ml-2 lg:ml-3 shrink-0"></i>
+        <input type="text" name="searchbar" id="searchbar" placeholder="Search..." class="flex-1 min-w-0 bg-transparent outline-none border-none px-2 lg:px-3 text-slate-900 dark:text-white text-xs lg:text-sm rounded-lg">
+        <span class="hidden lg:block text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded mr-2 px-2 py-1"> ⌘ K</span>
+    </div>
+
+
+<!-- RIGHT SIDE -->
+<div class="flex items-center gap-2 md:gap-3 lg:gap-5 shrink-0">
+    <div class="relative">
+        <button id="notificationBtn" class="relative p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+        <i data-lucide="bell" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-500 dark:text-slate-300"></i>
+        <span id="notificationCount" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center">0</span>
+    </button>
+    </div>
+<!-- Notification Dropdown -->
+    <div id="notificationDropdown" class="hidden absolute right-0 top-10 w-72 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl shadow-xl z-50">
+       <div class="px-4 py-3 border-b border-slate-300 dark:border-slate-700">
+          <p class="text-slate-900 dark:text-white text-sm font-semibold">Notifications</p>
+          <p class="text-slate-500 text-xs mt-1">Recent security activity</p>
+   </div>
+
+   <div id="notificationList" class="p-2">
+   </div>
+
+   <div class="border-t border-slate-300 dark:border-slate-700 px-4 py-3">
+       <button class="text-blue-500 dark:text-blue-400 text-xs hover:text-blue-300">
+           View all notifications
+       </button>
+   </div>
+</div>
+
+
+<button id="brightBtn" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+    <i data-lucide="sun" class="w-5 h-5 text-slate-500 dark:text-slate-300"></i>
+</button>
+
+<!-- PROFILE -->
+    <div class="relative">
+        <button id="profilebtn" class="flex items-center gap-1 md:gap-2 lg:gap-3 px-1 md:px-2 py-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+            <div class="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-blue-600 flex items-center justify-center">
+                <i data-lucide="user" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-300"></i>
+            </div>
+
+            <div class="hidden lg:flex flex-col items-start">
+                <p class="text-slate-900 dark:text-white text-sm font-semibold"> Hania</p>
+                <p class="text-slate-500 dark:text-slate-400 text-xs"> Admin</p>
+            </div>
+            <i data-lucide="chevron-down" class="w-3 h-3 lg:w-4 lg:h-4 text-slate-500 dark:text-slate-400"> </i>
+        </button>
+
+<!-- Dropdown -->
+        <div id="profileDropdown" class="hidden absolute right-0 top-14 w-52 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl shadow-xl p-2 z-50">
+            <div class="px-3 py-2 border-b border-slate-300 dark:border-slate-700 mb-2">
+                <p class="text-slate-900 dark:text-white text-sm font-semibold"> Hania</p>
+                <p class="text-slate-500 dark:text-slate-400 text-xs"> Admin</p>
+            </div>
+
+            <a href="Settings.html#profileSection" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                <span class="text-sm"> Profile</span>
+            </a>
+
+            <a href="Settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span class="text-sm"> Settings</span>
+            </a>
+
+            <a href="Logout.html" id="logoutBtn" class="flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span class="text-sm"> Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+ <hr class="border-slate-200 dark:border-slate-800">
+
+
+ <!-- Main content -->
+ <div class="bg-white dark:bg-slate-950 min-h-screen px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8 pt-3 sm:pt-4 pb-6">
+    <div class="block lg:hidden mb-4">
+        <h1 class="text-xl font-semibold text-slate-900 dark:text-white/90">AI Remediation</h1>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"> Get AI-powered recommendations and fix vulnerabilities faster.</p>
+    </div>
+    <div class="bg-slate-100 dark:bg-slate-900/50 w-full min-h-[86vh] rounded-xl shadow shadow-lg shadow-blue-950/30 border border-slate-200 dark:border-slate-700/60 ">
+    <div class="p-4 sm:p-5">
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-5 p-4 sm:p-5">
+                <!-- LEFT SIDE -->
+            <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+                
+                <!-- Red icon box -->
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-red-100 dark:bg-red-500/20 flex items-center justify-center shrink-0">
+                    <i data-lucide="bug" class="w-5 h-5 text-red-500 dark:text-red-400"></i>
+                    </div>
+                
+                    <!-- Finding information -->
+                    <div class="flex flex-col">
+                        <h2 id="remediationFindingTitle" class="text-base sm:text-lg text-slate-900 dark:text-white/85 font-semibold"></h2>
+                        <p id="remediationFindingId" class="mt-1 text-slate-500 dark:text-white/60 text-xs"></p>
+                    </div>
+                
+                    <!-- Critical + date -->
+                    <div class="flex flex-col sm:ml-2">
+                        <div id="remediationFindingSeverity" class=" w-fit px-3 py-1 rounded-md bg-red-100 dark:bg-red-500/20 text-red-500 dark:text-red-400 text-xs font-medium"></div>
+                        <p id="remediationFindingDate" class="mt-2 text-slate-500 dark:text-white/60 text-xs "></p>
+                    </div>
+                </div>
+                
+                <!-- Right side -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
+                    <button id="markResolvedBtn" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors  w-full sm:w-auto">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                        <span id="markResolvedText">Mark as Resolved</span>
+                    </button>
+                    <button id="generateRemediationBtn" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-500 shadow-lg shadow-blue-600/20 transition-colors w-full sm:w-auto">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span id="generateRemediationText">Generate Remediation</span>
+                    </button>
+                </div>
+            </div>
+                
+            <!-- FINDING METADATA -->
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 mt-3 pl-0 sm:pl-4 text-xs">
+                <!-- Domain -->
+                <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                    <i data-lucide="globe-2" class="w-4 h-4 text-slate-500"></i>
+                    <span id="remediationFindingEndpoint"></span>
+                </div>
+                  
+                <!-- Separator -->
+                <span class="text-slate-300 dark:text-slate-700">|</span>
+                   
+                <!-- Injection -->
+                <div class="flex items-center gap-2 px-3 py-1 rounded-md bg-blue-100 dark:bg-blue-500/10 text-blue-500 dark:text-blue-400">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span id="remediationFindingType"></span>
+                </div>
+                   
+                <!-- Separator -->
+                <span class="text-slate-300 dark:text-slate-700">|</span>
+                    <!-- Open -->
+                <div id="findingStatus" class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                    <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    <span id="statusText"></span>
+                </div>
+                   
+                <!-- Separator -->
+                <span class="text-slate-300 dark:text-slate-700">|</span>
+                    
+                <!-- CVSS -->
+                <div>
+                    <p class="text-xs text-slate-500">CVSS Score</p>
+                    <p id="remediationFindingCvss"
+                       class="text-lg font-semibold text-slate-900 dark:text-white">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+
+<!-- Inside box -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 p-4 sm:p-5">
+    <!-- LEFT COLUMN -->
+    <div class="lg:col-span-8 space-y-5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4">
+        <!-- TABS -->
+        <div class="flex flex-wrap items-center gap-5 pb-4 border-b border-slate-200 dark:border-slate-700/50">
+            <!-- AI ANALYSIS TAB -->
+            <button id="aiAnalysisTab" class="remediation-tab flex items-center gap-2 text-sm text-blue-500 underline decoration-blue-500 decoration-2 underline-offset-4">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>AI Analysis</span>
+            </button>
+
+            <!-- REMEDIATION TAB -->
+            <button id="remediationTab" class="remediation-tab text-sm text-slate-500 dark:text-slate-400" >Remediation</button>
+
+            <!-- CODE EXAMPLE TAB -->
+            <button id="codeExampleTab" class="remediation-tab text-sm text-slate-500 dark:text-slate-400" >Code Example</button>
+
+            <!-- REFERENCES TAB -->
+            <button id="referenceTab" class="remediation-tab text-sm text-slate-500 dark:text-slate-400" >References</button>
+
+        </div>
+
+        <!-- AI ANALYSIS CONTENT -->
+        <div id="aiAnalysisContent" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <!-- WHAT IS THIS VULNERABILITY -->
+                    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="info" class="w-4 h-4 text-blue-500 dark:text-blue-400"></i>
+                            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                What is this vulnerability?
+                            </h3>
+                        </div>
+
+                        <p id="vulnerabilityDescription" class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        </p>
+                    </div>
+
+                    <!-- AI ANALYSIS SUMMARY -->
+    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+        <div class="flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-500 dark:text-blue-400"></i>
+            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                AI Analysis Summary
+            </h3>
+        </div>
+
+        <p id="aiAnalysisSummary" class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+        </p>
+    </div>
+
+                    <!-- WHY IS IT DANGEROUS -->
+                    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="triangle-alert" class="w-4 h-4 text-orange-500 dark:text-orange-400"></i>
+                            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                Why is it dangerous?
+                            </h3>
+                        </div>
+
+                        <p id="whyDangerous" class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        </p>
+                    </div>
+
+                    <!-- SEVERITY ASSESSMENT -->
+    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+        <div class="flex items-center gap-2">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-red-500 dark:text-red-400"></i>
+            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                Severity Assessment
+            </h3>
+        </div>
+
+        <div class="mt-4">
+            <span id="severityAssessment" class="inline-block px-3 py-1 rounded-md bg-red-100 dark:bg-red-500/20 text-red-500 dark:text-red-400 text-xs font-medium">
+            </span>
+
+            <p class="mt-4 text-xs text-slate-500 dark:text-slate-400">
+                CVSS Score: <span id="assessmentCvss"></span>
+            </p>
+        </div>
+
+    </div>
+
+                    <!-- POTENTIAL IMPACT -->
+                    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2">
+
+                            <i data-lucide="shield-alert" class="w-4 h-4 text-red-500 dark:text-red-400"></i>
+                            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                Potential Impact
+                            </h3>
+                        </div>
+
+                        <div id="potentialImpact" class="mt-3 space-y-2">
+                        </div>
+                    </div>
+
+
+                    <!-- AI CONFIDENCE SCORE -->
+                    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="chart-no-axes-combined" class="w-4 h-4 text-green-500 dark:text-green-400"></i>
+                            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                                AI Confidence Score
+                            </h3>
+                        </div>
+
+                        <div class="flex items-center gap-3 mt-4">
+                            <span id="aiConfidenceScore" class="text-2xl font-semibold text-green-500 dark:text-green-400">
+                            </span>
+
+                            <div class="flex-1 h-2 bg-slate-300 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div id="aiConfidenceBar" class="h-full bg-green-500 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <p id="aiConfidenceText" class="mt-3 text-xs text-slate-600 dark:text-slate-400">
+                        </p>
+                    </div>
+                </div>
+
+
+        <!-- REMEDIATION CONTENT -->
+        <div id="remediationContent" class="hidden">
+            <div class="space-y-4 mt-4">
+
+                <!-- AI RECOMMENDED FIX -->
+                <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2">
+
+                        <i data-lucide="sparkles" class="w-5 h-5 text-blue-500"></i>
+                        <h3 class="text-sm font-semibold text-blue-500 dark:text-blue-400">
+                            AI Recommended Fix
+                        </h3>
+                    </div>
+
+                    <p id="aiRecommendedFix" class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    </p>
+                </div>
+
+
+                <!-- WHY THIS WORKS -->
+                <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Why this works
+                    </h3>
+
+                    <p id="whyThisWorks" class="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    </p>
+                </div>
+
+
+                <!-- ADDITIONAL RECOMMENDATIONS -->
+                <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Additional Recommendations
+                    </h3>
+
+                    <div id="additionalRecommendations" class="mt-3 space-y-2">
+                        </div>
+                        </div>
+
+
+                <!-- IMPLEMENTATION STEPS -->
+                <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="list-checks" class="w-4 h-4 text-blue-500 dark:text-blue-400"></i>
+                        <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            Implementation Steps
+                        </h3>
+                    </div>
+
+                    <div id="implementationSteps" class="mt-4 space-y-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- CODE EXAMPLE CONTENT -->
+        <div id="codeExampleContent" class="hidden">
+            <div class="space-y-4 mt-4">
+                <!-- VULNERABLE CODE -->
+                <div class="bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-700/50 rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <h3 class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Vulnerable Code (Example)
+                        </h3>
+
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400">
+                                PHP
+                            </span>
+
+                            <button id="copyVulnerableCode" class="cursor-pointer" type="button">
+                                <i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <pre class="px-4 pb-4 text-xs text-slate-600 dark:text-slate-400 overflow-x-auto">
+                        <code id="vulnerableCode"></code></pre>
+                </div>
+
+
+                <!-- SECURE CODE -->
+                <div class="bg-slate-100 dark:bg-slate-950/80 border border-green-500/50 rounded-lg overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <h3 class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Secure Code (Example)
+                        </h3>
+
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400">
+                                PHP
+                            </span>
+
+                            <button id="copySecureCode" class="cursor-pointer" type="button">
+                                <i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <pre class="px-4 pb-4 text-xs text-slate-600 dark:text-slate-400 overflow-x-auto">
+                        <code id="secureCode"></code></pre>
+                </div>
+            
+                
+
+
+                <!-- CODE EXPLANATION -->
+                <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-500">
+                        </i>
+                        <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            Why the secure code is safer
+                        </h3>
+                    </div>
+                    <p id="secureCodeExplanation" class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- REFERENCES CONTENT -->
+        <div id="referencesContent" class="hidden">
+            <div class="space-y-4 mt-4">
+                <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-4 h-4 text-blue-500"></i>
+                        <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            Security References
+                        </h3>
+                    </div>
+
+                    <div class="mt-4 space-y-3">
+                        <a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank" class="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                            <p class="text-sm font-medium text-blue-500">
+                                OWASP SQL Injection
+                            </p>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                Learn about SQL injection vulnerabilities and prevention techniques.
+                            </p>
+                        </a>
+
+
+                        <a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html" target="_blank" class="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                            <p class="text-sm font-medium text-blue-500">
+                                OWASP SQL Injection Prevention Cheat Sheet
+                            </p>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                Recommended practices for preventing SQL injection attacks.
+                            </p>
+                        </a>
+
+
+                        <a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank" class="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                            <p class="text-sm font-medium text-blue-500">
+                                CWE-89: SQL Injection
+                            </p>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                Detailed classification and technical information about SQL injection.
+                            </p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+
+    <div class="lg:col-span-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4">
+        <div class="space-y-4">
+
+            <!-- LEARN MORE -->
+            <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg p-4">
+                <h3 class="text-sm font-semibold text-blue-500 dark:text-blue-400">
+                    Learn More
+                </h3>
+
+                <p id="learnMoreText" class="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                </p>
+
+                <button id="viewDocumentationBtn" class="mt-3 flex items-center gap-2 px-3 py-2 rounded-md border border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                    <span>View Documentation</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <!-- SIMILAR FINDINGS -->
+            <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 rounded-lg overflow-hidden">
+                <div class="flex items-center justify-between p-4">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Similar Findings in This Report
+                    </h3>
+
+                    <span id="viewAllFindings" class="text-xs text-blue-500 dark:text-blue-400 cursor-pointer">
+                        View All
+                    </span>
+                </div>
+
+                <div id="similarFindingsContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/script.js"></script>
+<script src="js/AI_Remediation.js"></script>
+</body>
+</html>

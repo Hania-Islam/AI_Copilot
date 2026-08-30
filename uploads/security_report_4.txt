@@ -1,0 +1,63 @@
+FINDING 001
+Title: SQL Injection
+Severity: Critical
+Affected Endpoint: /api/products
+Description: User input is incorporated into a database query.
+Evidence: SQL syntax changes the application's database response.
+Recommendation: Use parameterized queries.
+
+FINDING 002
+Title: Command Injection
+Severity: Critical
+Affected Endpoint: /api/tools
+Description: User input may reach an operating system command.
+Evidence: Shell metacharacters affected command execution.
+Recommendation: Avoid shell execution with user-controlled input.
+
+FINDING 003
+Title: Cross-Site Scripting (XSS)
+Severity: High
+Affected Endpoint: /comments
+Description: User comments are rendered without sufficient encoding.
+Evidence: HTML content is rendered in the browser.
+Recommendation: Encode untrusted output.
+
+FINDING 004
+Title: Broken Access Control
+Severity: High
+Affected Endpoint: /api/profile
+Description: Authorization checks are insufficient for profile resources.
+Evidence: Users can access another profile by changing an identifier.
+Recommendation: Enforce server-side authorization.
+
+FINDING 005
+Title: Missing Security Headers
+Severity: Medium
+Affected Endpoint: /
+Description: Important browser security headers are missing.
+Evidence: Multiple recommended headers are absent.
+Recommendation: Configure security headers.
+
+FINDING 006
+Title: Weak Password Policy
+Severity: Medium
+Affected Endpoint: /signup
+Description: The password policy permits weak passwords.
+Evidence: Passwords below recommended complexity were accepted.
+Recommendation: Enforce stronger password requirements.
+
+FINDING 007
+Title: Insecure Cookie Configuration
+Severity: Medium
+Affected Endpoint: /login
+Description: Authentication cookies lack recommended security attributes.
+Evidence: Secure cookie attributes were missing.
+Recommendation: Configure Secure and HttpOnly attributes.
+
+FINDING 008
+Title: Information Disclosure
+Severity: Low
+Affected Endpoint: /api/debug
+Description: Debug information is exposed to clients.
+Evidence: Internal application details appear in responses.
+Recommendation: Disable debug output in production.

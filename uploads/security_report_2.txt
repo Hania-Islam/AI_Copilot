@@ -1,0 +1,39 @@
+FINDING 001
+Title: SQL Injection
+Severity: Critical
+Affected Endpoint: /api/login
+Description: User input is directly included in a database query.
+Evidence: The user parameter accepts SQL metacharacters and causes database errors.
+Recommendation: Use parameterized queries and validate user input.
+
+FINDING 002
+Title: Cross-Site Scripting (XSS)
+Severity: High
+Affected Endpoint: /search
+Description: Search input is reflected without adequate output encoding.
+Evidence: A script payload is reflected in the response.
+Recommendation: Apply contextual output encoding.
+
+FINDING 003
+Title: Missing Security Headers
+Severity: Medium
+Affected Endpoint: /
+Description: Recommended HTTP security headers are missing.
+Evidence: Security headers were absent from HTTP responses.
+Recommendation: Configure appropriate security headers.
+
+FINDING 004
+Title: Weak Password Policy
+Severity: Medium
+Affected Endpoint: /register
+Description: Users can create passwords that do not meet strong policy requirements.
+Evidence: Short and simple passwords were accepted.
+Recommendation: Enforce a strong password policy.
+
+FINDING 005
+Title: Information Disclosure
+Severity: Low
+Affected Endpoint: /api/status
+Description: Server and software version information is exposed.
+Evidence: The API response contains detailed version information.
+Recommendation: Remove unnecessary version information from responses.

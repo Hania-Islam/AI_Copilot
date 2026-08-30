@@ -1,0 +1,56 @@
+AI SECURITY COPILOT - SECURITY ASSESSMENT REPORT
+
+Target: https://demo.example.com
+Assessment Type: Web Application Security Assessment
+Assessment Date: August 22, 2026
+
+FINDING 001
+Title: SQL Injection
+Severity: Critical
+Affected Endpoint: /api/users
+Description: The application appears to directly include user-supplied input in a database query without sufficient parameterization or input validation.
+Evidence: The parameter "user_id" accepts SQL metacharacters and produces database-related error responses.
+Recommendation: Use parameterized queries or prepared statements.
+
+FINDING 002
+Title: Cross-Site Scripting (XSS)
+Severity: High
+Affected Endpoint: /search
+Description: User-controlled search input is reflected in the application's response without adequate output encoding.
+Evidence: The search parameter is reflected into the HTML response without proper HTML encoding.
+Recommendation: Apply context-aware output encoding and validate user input.
+
+FINDING 003
+Title: Missing Security Headers
+Severity: Medium
+Affected Endpoint: /
+Description: Several recommended HTTP security headers are missing from the application responses.
+Evidence: Missing Content-Security-Policy, X-Content-Type-Options, and Strict-Transport-Security.
+Recommendation: Configure the application to send appropriate security headers.
+
+FINDING 004
+Title: Weak Password Policy
+Severity: Medium
+Affected Endpoint: /login
+Description: The application allows users to create passwords that do not meet a sufficiently strong password policy.
+Evidence: Passwords shorter than recommended minimum lengths were accepted during testing.
+Recommendation: Enforce a stronger password policy and encourage long, unique passwords.
+
+FINDING 005
+Title: Information Disclosure
+Severity: Low
+Affected Endpoint: /api/status
+Description: The API response exposes detailed server and software version information.
+Evidence: The response includes the application framework name and version.
+Recommendation: Remove unnecessary software version information from publicly accessible responses.
+
+SUMMARY
+Total Findings: 5
+Critical: 1
+High: 1
+Medium: 2
+Low: 1
+Overall Risk: High
+Risk Score: 82
+
+END OF REPORT

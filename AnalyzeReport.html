@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Security Copilot-Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="font-[Inter] overflow-x-hidden bg-white dark:bg-slate-950">
+
+    <!-- MOBILE HEADER -->
+    <header class="md:hidden sticky top-0 z-30 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+        <div class="h-14 px-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+                <img src="assets/logo/logo.png" alt="AI Security Copilot Logo" class="w-8 h-8 shrink-0">
+
+                <p class="text-slate-900 dark:text-white font-bold text-[13px] truncate">
+                    <span class="text-blue-500">AI</span> Security Copilot
+                </p>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+                <button id="mobileMenuBtn" class="text-slate-900 dark:text-white text-2xl p-2" aria-label="Open menu"> ☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HEADING -->
+    <div class="md:hidden px-4 pt-5 pb-3 bg-white dark:bg-slate-950">
+        <h1 class="text-slate-900 dark:text-white text-xl font-semibold">
+            Analyze New Report
+        </h1>
+
+        <p class="text-slate-600 dark:text-slate-400 text-xs mt-1">
+            Upload a security report and let AI analyze it for vulnerabilities
+        </p>
+    </div>
+
+    <!-- MOBILE DRAWER -->
+<div id="mobileOverlay" class="hidden fixed inset-0 bg-black/40 dark:bg-black/60 z-40"></div>
+<aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 z-50 w-72 max-w-[85vw] -translate-x-full transition-transform duration-300 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto md:hidden">
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+            <img alt="AI Security Copilot Logo" class="w-10 h-10" src="assets/logo/logo.png"/>
+            <p class="text-slate-900 dark:text-white font-bold text-base leading-tight">
+                <span class="text-blue-500">AI</span> Security<br/>Copilot
+            </p>
+        </div>
+
+        <button aria-label="Close menu" class="text-slate-700 dark:text-slate-300 text-2xl p-2" id="mobileCloseBtn"> ×</button>
+    </div>
+
+    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3"> Main </p>
+
+    <nav class="space-y-2">
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="dashboard.html">
+            <i class="w-5 h-5" data-lucide="layout-dashboard"></i>
+            <span class="font-medium text-sm">Dashboard</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-500/10 text-blue-400" href="AnalyzeReport.html">
+            <i class="w-5 h-5" data-lucide="file-search"></i>
+            <span class="text-sm font-medium">Analyze Report</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Findings.html">
+            <i class="w-5 h-5" data-lucide="shield-alert"></i>
+            <span class="text-sm font-medium">Findings</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="AI_Remediation.html">
+            <i class="w-5 h-5" data-lucide="sparkles"></i>
+            <span class="text-sm font-medium">AI Remediation</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="History.html">
+            <i class="w-5 h-5" data-lucide="history"></i>
+            <span class="text-sm font-medium">History</span>
+        </a>
+    </nav>
+
+    <!-- System -->
+    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-8 mb-3">System</p>
+    <nav class="space-y-2">
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Settings.html">
+            <i class="w-5 h-5" data-lucide="settings"></i>
+            <span class="text-sm font-medium">Settings</span>
+        </a>
+
+        <a class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition" href="Logout.html">
+            <i class="w-5 h-5" data-lucide="log-out"></i>
+            <span class="text-sm font-medium">Logout</span>
+        </a>
+    </nav>
+</aside>
+
+
+<!-- DESKTOP LAYOUT -->
+<div class="flex min-h-screen">
+    <!-- DESKTOP SIDEBAR-->
+    <aside class="hidden md:flex sticky w-64 flex-shrink-0 flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800">
+        <!-- LOGO -->
+        <div class="px-4 pt-4">
+            <div class="flex items-center gap-3">
+                <img src="assets/logo/logo.png" alt="AI Security Copilot Logo" class="w-12 h-12">
+                <p class="text-slate-900 dark:text-white font-bold text-lg leading-tight">
+                    <span class="text-blue-500">AI</span> Security<br>Copilot
+                </p>
+            </div>
+
+            <!-- Tagline -->
+            <p class="text-[12px] leading-4 text-slate-600 dark:text-slate-400 mt-2 px-4 whitespace-nowrap"> Smart Analysis<br> Stronger Security</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="mt-8 px-4 flex-1 flex flex-col">
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider mb-3"> Main</p>
+            <div class="space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span class="font-medium text-sm">Dashboard</span>
+                </a>
+
+                <a href="AnalyzeReport.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-500/10 text-blue-400">
+                    <i data-lucide="file-search" class="w-5 h-5"></i>
+                    <span class="text-sm font-medium">Analyze Report</span>
+                </a>
+
+                <a href="Findings.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    <span class="text-sm font-medium">Findings</span>
+                </a>
+
+                <a href="AI_Remediation.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span class="text-sm font-medium">AI Remediation</span>
+                </a>
+
+                <a href="History.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                    <i data-lucide="history" class="w-5 h-5"></i>
+                    <span class="text-sm font-medium">History</span>
+                </a>
+            </div>
+
+
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-8 mb-3"> System</p>
+            <a href="Settings.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                <span class="text-sm font-medium">Settings</span>
+            </a>
+
+            <a href="Logout.html" class="flex items-center gap-3 px-2 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span class="text-sm font-medium">Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+<!-- MAIN -->
+<main class="flex-1 min-w-0">
+    <!-- TOPBAR -->
+    <div id="desktopTopbar" class="hidden md:flex bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-20 justify-between items-center px-3 md:px-4 lg:px-6 xl:px-8 gap-2 lg:gap-4">
+    
+    <!-- TITLE -->
+    <div class="flex flex-col min-w-0 shrink-0">
+    <p class="text-slate-900 dark:text-white text-sm md:text-xs lg:text-sm xl:text-base whitespace-nowrap"> Analyze New Report</p>
+    <p class="hidden lg:block text-slate-600 dark:text-slate-400 text-xs mt-2 whitespace-nowrap"> Upload a security report and let AI analyze it for vulnerabilities</p>
+    </div>
+    
+    <!-- SEARCH -->
+    <div class="relative flex items-center w-32 md:w-36 lg:w-64 xl:w-96 h-9 lg:h-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-950 mx-1 lg:mx-3 min-w-0">
+    <i data-lucide="search" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-500 dark:text-slate-400 ml-2 lg:ml-3 shrink-0"></i>
+    <input type="text" name="searchbar" id="searchbar" placeholder="Search..." class="flex-1 min-w-0 bg-transparent outline-none border-none px-2 lg:px-3 text-slate-900 dark:text-white text-xs lg:text-sm rounded-lg">
+    <span class="hidden lg:block text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded mr-2 px-2 py-1"> ⌘ K</span>
+    </div>
+    
+    
+    <!-- RIGHT SIDE -->
+    <div class="flex items-center gap-2 md:gap-3 lg:gap-5 shrink-0">
+    <div class="relative">
+        <button id="notificationBtn" class="relative p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+        <i data-lucide="bell" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-600 dark:text-slate-300"></i>
+        <span id="notificationCount" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center">0</span>
+   </button>
+    </div>
+
+    <!-- Notification Dropdown -->
+    <div id="notificationDropdown"
+    class="hidden absolute right-0 top-10 w-72 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl shadow-xl z-50">
+
+   <div class="px-4 py-3 border-b border-slate-300 dark:border-slate-700">
+       <p class="text-slate-900 dark:text-white text-sm font-semibold">Notifications</p>
+       <p class="text-slate-500 text-xs mt-1">Recent security activity</p>
+   </div>
+
+   <div id="notificationList" class="p-2">
+   </div>
+
+   <div class="border-t border-slate-300 dark:border-slate-700 px-4 py-3">
+       <button class="text-blue-500 dark:text-blue-400 text-xs hover:text-blue-300">
+           View all notifications
+       </button>
+   </div>
+</div>
+
+
+    <button id="brightBtn" class="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-1 transition">
+        <i data-lucide="sun" class="w-4 h-4 lg:w-5 lg:h-5"></i>
+    </button>
+    
+    
+    <!-- PROFILE -->
+    <div class="relative">
+        <button id="profilebtn" class="flex items-center gap-1 md:gap-2 lg:gap-3 px-1 md:px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            <div class="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-blue-600 flex items-center justify-center">
+                <i data-lucide="user" class="w-4 h-4 lg:w-5 lg:h-5 text-slate-300"></i>
+            </div>
+    
+            <div class="hidden lg:flex flex-col items-start">
+                <p class="text-slate-900 dark:text-white text-sm font-semibold"> Hania</p>
+                <p class="text-slate-600 dark:text-slate-400 text-xs"> Admin</p>
+            </div>
+    
+            <i data-lucide="chevron-down" class="w-3 h-3 lg:w-4 lg:h-4 text-slate-500 dark:text-slate-400"> </i>
+        </button>
+    
+    
+        <!-- Dropdown -->
+        <div id="profileDropdown" class="hidden absolute right-0 top-14 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-2 z-50">
+            <div class="px-3 py-2 border-b border-slate-200 dark:border-slate-700 mb-2">
+                <p class="text-slate-900 dark:text-white text-sm font-semibold"> Hania</p>
+                <p class="text-slate-600 dark:text-slate-400 text-xs"> Admin</p>
+            </div>
+    
+            <a href="Settings.html#profileSection" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                <span class="text-sm"> Profile</span>
+            </a>
+    
+            <a href="Settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
+                <i data-lucide="settings" class="w-4 h-4"></i>
+                <span class="text-sm"> Settings</span>
+            </a>
+    
+            <a href="Logout.html" id="logoutBtn" class="flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span class="text-sm"> Logout</span>
+            </a>
+        </div>
+    </div>
+    </div>
+    </div>
+    <hr class="border-slate-200 dark:border-slate-800">
+
+<!-- MAIN CONTENT -->
+<div class="bg-white dark:bg-slate-950 min-h-screen px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8 pt-3 sm:pt-4 pb-6">
+    <div class="grid grid-cols-1 lg:grid-cols-10 gap-4 sm:gap-5 lg:gap-6">
+    
+        <!-- LEFT SIDE 70%-->
+        <div class="lg:col-span-7 space-y-4 sm:space-y-5 lg:space-y-6">
+            <!-- UPLOAD BOX -->
+            <div id="upldBox" class="relative min-h-[360px] sm:min-h-[400px] lg:min-h-[450px] border-2 border-dashed border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 rounded-lg shadow-lg shadow-blue-500/15 flex items-center justify-center mt-2 md:mt-4 lg:mt-6 overflow-hidden">
+                <div class="flex flex-col items-center justify-center px-4 text-center">
+                    <i data-lucide="file-up" class="w-14 h-14 sm:w-16 sm:h-16 text-blue-500"> </i>
+                    <p id="dropArea" class="text-sm sm:text-base text-slate-800 dark:text-white/85 mt-3">  Drag & Drop your report here</p>
+                    <p class="text-slate-500 dark:text-white/60 text-xs mt-4"> or</p>
+                    
+                    <button type="button" id="file" class="flex items-center gap-2 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg py-2 px-4 mt-4 hover:bg-blue-100 dark:hover:bg-blue-600/20 transition">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                        <span>Choose File</span>
+                    </button>
+                    <input type="file" id="fileInput" class="hidden" accept=".pdf,.json,.txt,.csv">
+                    <!-- SELECTED FILE AREA -->
+                    <div id="selectedFile" class="hidden w-full max-w-md mt-5 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="file-text" class="w-5 h-5 text-blue-500 shrink-0"></i>
+                        <div class="min-w-0 flex-1 text-left">
+                            <p id="selectedFileName" class="text-slate-800 dark:text-white text-xs font-medium truncate"></p>
+                            <p id="selectedFileSize" class="text-slate-500 dark:text-slate-400 text-[11px] mt-1"></p>
+                        </div>
+
+                        <button type="button" id="removeFile" class="text-slate-500 hover:text-red-400 transition shrink-0" aria-label="Remove selected file">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <p id="fileError" class="hidden text-red-500 dark:text-red-400 text-xs mt-3"></p>
+                    <p class="text-slate-500 dark:text-white/60 text-xs mt-7"> Supported Formats: PDF, JSON, TXT, CSV</p>
+                    <p class="text-slate-500 dark:text-white/60 text-xs mt-2"> Maximum file size: 50MB</p>
+                </div>
+            </div>
+    
+            <!-- RECENT UPLOADS -->
+            <div class="min-h-[300px] relative border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 shadow-md shadow-slate-500/15 rounded-lg overflow-hidden">
+                <div class="flex items-center justify-between px-4 sm:px-5 py-4">
+                    <p class="text-slate-800 dark:text-white/85 text-sm sm:text-base"> Recent Uploads </p>
+                    <button id="viewAllFindings" class="text-blue-400 text-xs hover:text-blue-300"> View All </button>
+                </div>
+    
+                <!-- TABLE -->
+                <div class="overflow-x-auto">
+                    <div id="recentUploadsTable" class="min-w-[650px]">
+                        <div class="upload-row grid grid-cols-[2fr_1fr_1.5fr_1fr_0.5fr] px-5 py-3 border-y border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+                            <span>File Name</span>
+                            <span>Type</span>
+                            <span>Uploaded</span>
+                            <span>Status</span>
+                            <span>Findings</span>
+                        </div>
+
+                        <div id="recentUploads"></div>
+                     </div>
+                </div>
+                </div>
+                </div>
+
+    <!-- RIGHT SIDE 30%-->
+    <div class="lg:col-span-3 space-y-4 sm:space-y-5 lg:space-y-6">
+
+        <!-- HOW IT WORKS -->
+        <div class="min-h-[430px] lg:min-h-[450px] relative border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 shadow-md shadow-slate-500/15 rounded-lg py-4 lg:mt-6">
+            <p class="text-slate-800 dark:text-white/85 text-sm sm:text-base ml-4 mb-5"> How it works </p>
+
+            <!-- STEP 1 -->
+            <div class="flex items-center px-3 sm:px-4 mb-7">
+                <div class="w-10 h-10 shrink-0 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i data-lucide="upload" class="w-5 h-5 text-white"> </i>
+                </div>
+
+                <div class="ml-3 sm:ml-4 min-w-0">
+                    <h1 class="text-slate-800 dark:text-white/85 text-sm"> Upload Report </h1>
+                    <p class="text-xs text-slate-500 dark:text-white/60 mt-2 leading-relaxed"> Upload your Security report<br class="hidden sm:block"> in any supported format </p>
+                </div>
+            </div>
+
+
+            <!-- STEP 2 -->
+            <div class="flex items-center px-3 sm:px-4 mb-7">
+                <div class="w-10 h-10 shrink-0 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                </div>
+
+                <div class="ml-3 sm:ml-4 min-w-0">
+                    <h1 class="text-slate-800 dark:text-white/85 text-sm"> AI Analysis </h1>
+                    <p class="text-xs text-slate-500 dark:text-white/60 mt-2 leading-relaxed"> Our AI will analyze the report <br class="hidden sm:block"> and identify vulnerabilities </p>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="flex items-center px-3 sm:px-4 mb-7">
+                <div class="w-10 h-10 shrink-0 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"> </i>
+                </div>
+
+                <div class="ml-3 sm:ml-4 min-w-0">
+                    <h1 class="text-slate-800 dark:text-white/85 text-sm">Get Results</h1>
+                    <p class="text-xs text-slate-500 dark:text-white/60 mt-2 leading-relaxed">View detailed findings and<br class="hidden sm:block">remediation recommendations </p>
+                </div>
+            </div>
+
+
+            <!-- STEP 4 -->
+            <div class="flex items-center px-3 sm:px-4">
+                <div class="w-10 h-10 shrink-0 rounded-full bg-blue-500 flex items-center justify-center">
+                    <i  data-lucide="check" class="w-5 h-5 text-white"></i>
+                </div>
+
+                <div class="ml-3 sm:ml-4 min-w-0">
+                    <h1 class="text-slate-800 dark:text-white/85 text-sm">Take Action</h1>
+                    <p class="text-xs text-slate-500 dark:text-white/60 mt-2 leading-relaxed">Fix issues and improve your<br class="hidden sm:block">security posture </p>
+                </div>
+            </div>
+        </div>
+
+                <!-- SUPPORTED FORMATS -->
+                <div class="min-h-[110px] relative border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 shadow-md shadow-slate-500/15 rounded-lg p-4">
+                    <p class="text-slate-800 dark:text-white/85 text-sm sm:text-base">Supported Formats</p>
+                    <div class="flex flex-wrap mt-4 gap-x-5 gap-y-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-red-500">  </i>
+                            <p class="text-slate-700 dark:text-white/70 text-xs">PDF</p>
+                        </div>
+        
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="braces" class="w-4 h-4 text-green-500"></i>
+                            <p class="text-slate-700 dark:text-white/70 text-xs"> JSON</p>
+                        </div>
+        
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="file" class="w-4 h-4 text-blue-500"></i>
+                            <p class="text-slate-700 dark:text-white/70 text-xs"> TXT</p>
+                        </div>
+        
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="table-2" class="w-4 h-4 text-green-500"></i>
+                            <p class="text-slate-700 dark:text-white/70 text-xs"> CSV </p>
+                        </div>
+                    </div>
+                </div>
+        
+        
+                <!-- NEED HELP -->
+                <div class="min-h-[150px] relative border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 shadow-md shadow-slate-500/15 rounded-lg p-4">
+                    <p class="text-slate-800 dark:text-white/85 text-sm sm:text-base">Need Help</p>
+                    <p class="text-slate-700 dark:text-white/70 text-sm mt-2 leading-relaxed">Check our documentation or<br class="hidden sm:block">contact support</p>
+        
+                    <button id="document" class="flex items-center gap-2 text-white bg-blue-800 hover:bg-blue-700 transition rounded-lg py-2 px-4 mt-5">
+                        <i data-lucide="external-link" class="w-4 h-4"> </i>
+                        <span>View Documentation</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+
+
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/script.js"></script>
+<script src="js/AnalyzeReport.js"></script>
+</body>
+</html>

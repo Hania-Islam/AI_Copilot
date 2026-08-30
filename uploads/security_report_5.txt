@@ -1,0 +1,39 @@
+FINDING 001
+Title: Cross-Site Scripting (XSS)
+Severity: High
+Affected Endpoint: /search
+Description: Search parameters are reflected without adequate encoding.
+Evidence: A script payload was reflected to the browser.
+Recommendation: Apply contextual output encoding.
+
+FINDING 002
+Title: Insecure Direct Object Reference
+Severity: High
+Affected Endpoint: /api/files
+Description: Users can access objects belonging to other accounts.
+Evidence: Modifying an object identifier exposed another user's file.
+Recommendation: Check authorization for every object request.
+
+FINDING 003
+Title: Missing Security Headers
+Severity: Medium
+Affected Endpoint: /
+Description: Recommended security headers are absent.
+Evidence: Security header checks reported multiple missing headers.
+Recommendation: Configure appropriate headers.
+
+FINDING 004
+Title: Weak Password Policy
+Severity: Medium
+Affected Endpoint: /account/password
+Description: Password complexity requirements are too weak.
+Evidence: Simple passwords were accepted.
+Recommendation: Enforce stronger password requirements.
+
+FINDING 005
+Title: Unvalidated Redirect
+Severity: Low
+Affected Endpoint: /redirect
+Description: Redirect destinations are not sufficiently validated.
+Evidence: External redirect destinations were accepted.
+Recommendation: Allow only trusted redirect destinations.

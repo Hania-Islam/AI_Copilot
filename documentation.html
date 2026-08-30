@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Security Copilot - Documentation</title>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-white font-['Inter']">
+
+    <!-- PAGE -->
+    <div class="min-h-screen">
+
+        <!-- HEADER -->
+        <header class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <div class="max-w-6xl mx-auto px-5 sm:px-8 py-5">
+
+                <div class="flex items-center justify-between gap-4">
+
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center">
+                                <i data-lucide="shield-check" class="w-6 h-6 text-blue-500"></i>
+                            </div>
+
+                            <div>
+                                <h1 class="text-lg sm:text-xl font-semibold">
+                                    AI Security Copilot
+                                </h1>
+
+                                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                                    Documentation
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a
+                        href="AnalyzeReport.html"
+                        class="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 transition"
+                    >
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Back to Analyze
+                    </a>
+
+                </div>
+
+            </div>
+        </header>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-10">
+
+            <!-- INTRO -->
+            <section class="mb-10">
+
+                <div class="max-w-3xl">
+
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-medium">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                        User Guide
+                    </span>
+
+                    <h2 class="text-2xl sm:text-3xl font-bold mt-4">
+                        AI Security Copilot Documentation
+                    </h2>
+
+                    <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-3 leading-7">
+                        Learn how to upload security reports, review detected
+                        vulnerabilities, understand findings, and use AI-assisted
+                        remediation recommendations.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- CONTENT GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-8">
+
+
+                <!-- SIDEBAR -->
+                <aside class="lg:sticky lg:top-6 lg:self-start">
+
+                    <div class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                            On this page
+                        </p>
+
+                        <nav class="space-y-1">
+
+                            <a href="#getting-started"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                Getting Started
+                            </a>
+
+                            <a href="#analyze-report"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                Analyze a Report
+                            </a>
+
+                            <a href="#formats"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                Supported Formats
+                            </a>
+
+                            <a href="#findings"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                Understanding Findings
+                            </a>
+
+                            <a href="#remediation"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                AI Remediation
+                            </a>
+
+                            <a href="#dashboard"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                Dashboard
+                            </a>
+
+                            <a href="#security"
+                               class="block px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                Security & Privacy
+                            </a>
+
+                        </nav>
+
+                    </div>
+
+                </aside>
+
+
+                <!-- DOCUMENTATION -->
+                <div class="space-y-8">
+
+
+                    <!-- GETTING STARTED -->
+                    <section
+                        id="getting-started"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <div class="flex items-start gap-4">
+
+                            <div class="w-10 h-10 shrink-0 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                <i data-lucide="rocket" class="w-5 h-5 text-blue-500"></i>
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-lg font-semibold">
+                                    Getting Started
+                                </h3>
+
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-6">
+                                    AI Security Copilot helps security teams analyze
+                                    security reports, identify vulnerabilities, and
+                                    review AI-assisted remediation recommendations.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ANALYZE REPORT -->
+                    <section
+                        id="analyze-report"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <h3 class="text-lg font-semibold">
+                            Analyze a Report
+                        </h3>
+
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-6">
+                            Follow these steps to analyze a security report.
+                        </p>
+
+
+                        <div class="mt-6 space-y-4">
+
+                            <div class="flex gap-4">
+                                <span class="w-7 h-7 shrink-0 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs font-semibold">
+                                    1
+                                </span>
+
+                                <div>
+                                    <p class="text-sm font-medium">
+                                        Open Analyze Report
+                                    </p>
+
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Navigate to the Analyze Report page from the dashboard.
+                                    </p>
+                                </div>
+                            </div>
+
+
+                            <div class="flex gap-4">
+                                <span class="w-7 h-7 shrink-0 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs font-semibold">
+                                    2
+                                </span>
+
+                                <div>
+                                    <p class="text-sm font-medium">
+                                        Upload your report
+                                    </p>
+
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Choose a file or drag and drop it into the upload area.
+                                    </p>
+                                </div>
+                            </div>
+
+
+                            <div class="flex gap-4">
+                                <span class="w-7 h-7 shrink-0 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs font-semibold">
+                                    3
+                                </span>
+
+                                <div>
+                                    <p class="text-sm font-medium">
+                                        Verify the file
+                                    </p>
+
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Make sure the report uses a supported format and is within the maximum file size.
+                                    </p>
+                                </div>
+                            </div>
+
+
+                            <div class="flex gap-4">
+                                <span class="w-7 h-7 shrink-0 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs font-semibold">
+                                    4
+                                </span>
+
+                                <div>
+                                    <p class="text-sm font-medium">
+                                        Start analysis
+                                    </p>
+
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Start the analysis process and review the resulting security findings.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- FORMATS -->
+                    <section
+                        id="formats"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <h3 class="text-lg font-semibold">
+                            Supported Formats
+                        </h3>
+
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                            The application currently supports the following report formats.
+                        </p>
+
+
+                        <div class="overflow-x-auto mt-6">
+
+                            <table class="w-full min-w-[500px] text-sm">
+
+                                <thead>
+                                    <tr class="border-b border-slate-200 dark:border-slate-800">
+                                        <th class="text-left py-3 px-3 font-medium">
+                                            Format
+                                        </th>
+
+                                        <th class="text-left py-3 px-3 font-medium">
+                                            Description
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    <tr class="border-b border-slate-100 dark:border-slate-800/70">
+                                        <td class="py-3 px-3 font-medium text-blue-500">
+                                            PDF
+                                        </td>
+                                        <td class="py-3 px-3 text-slate-500 dark:text-slate-400">
+                                            Security assessment and vulnerability reports
+                                        </td>
+                                    </tr>
+
+                                    <tr class="border-b border-slate-100 dark:border-slate-800/70">
+                                        <td class="py-3 px-3 font-medium text-blue-500">
+                                            JSON
+                                        </td>
+                                        <td class="py-3 px-3 text-slate-500 dark:text-slate-400">
+                                            Structured security findings
+                                        </td>
+                                    </tr>
+
+                                    <tr class="border-b border-slate-100 dark:border-slate-800/70">
+                                        <td class="py-3 px-3 font-medium text-blue-500">
+                                            TXT
+                                        </td>
+                                        <td class="py-3 px-3 text-slate-500 dark:text-slate-400">
+                                            Plain-text security reports
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="py-3 px-3 font-medium text-blue-500">
+                                            CSV
+                                        </td>
+                                        <td class="py-3 px-3 text-slate-500 dark:text-slate-400">
+                                            Tabular security findings
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+                        <div class="flex items-center gap-3 mt-5 px-4 py-3 rounded-lg bg-blue-500/5 border border-blue-500/10">
+
+                            <i data-lucide="info" class="w-4 h-4 text-blue-500 shrink-0"></i>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                Maximum supported file size: <span class="font-medium text-slate-700 dark:text-slate-300">50 MB</span>
+                            </p>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- FINDINGS -->
+                    <section
+                        id="findings"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <h3 class="text-lg font-semibold">
+                            Understanding Findings
+                        </h3>
+
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-6">
+                            Findings represent potential security vulnerabilities
+                            identified during report analysis.
+                        </p>
+
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+
+                            <div class="p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+                                <p class="text-sm font-semibold text-red-500">
+                                    Critical
+                                </p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Immediate attention is recommended.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-lg border border-orange-500/20 bg-orange-500/5">
+                                <p class="text-sm font-semibold text-orange-500">
+                                    High
+                                </p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Represents a significant security risk.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-lg border border-yellow-500/20 bg-yellow-500/5">
+                                <p class="text-sm font-semibold text-yellow-500">
+                                    Medium
+                                </p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Represents a moderate security concern.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-lg border border-blue-500/20 bg-blue-500/5">
+                                <p class="text-sm font-semibold text-blue-500">
+                                    Low
+                                </p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Lower-priority issue that should still be reviewed.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- AI REMEDIATION -->
+                    <section
+                        id="remediation"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <div class="flex items-start gap-4">
+
+                            <div class="w-10 h-10 shrink-0 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-purple-500"></i>
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-lg font-semibold">
+                                    AI Remediation
+                                </h3>
+
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-6">
+                                    AI Security Copilot provides remediation guidance
+                                    to help users understand and address identified
+                                    security vulnerabilities.
+                                </p>
+
+                                <ul class="mt-4 space-y-2 text-sm text-slate-500 dark:text-slate-400">
+
+                                    <li class="flex gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-purple-500 shrink-0 mt-0.5"></i>
+                                        Vulnerability explanation
+                                    </li>
+
+                                    <li class="flex gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-purple-500 shrink-0 mt-0.5"></i>
+                                        Potential security impact
+                                    </li>
+
+                                    <li class="flex gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-purple-500 shrink-0 mt-0.5"></i>
+                                        Recommended remediation
+                                    </li>
+
+                                    <li class="flex gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-purple-500 shrink-0 mt-0.5"></i>
+                                        Suggested security improvements
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- DASHBOARD -->
+                    <section
+                        id="dashboard"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <h3 class="text-lg font-semibold">
+                            Dashboard
+                        </h3>
+
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-6">
+                            The dashboard provides an overview of your security
+                            analysis activity and detected findings.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+
+                            <div class="flex items-center gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Severity Metrics</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                                        Review findings by severity.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                                <i data-lucide="file-text" class="w-5 h-5 text-blue-500"></i>
+                                <div>
+                                    <p class="text-sm font-medium">Recent Uploads</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                                        Review recently analyzed reports.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- SECURITY -->
+                    <section
+                        id="security"
+                        class="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-5 sm:p-7"
+                    >
+
+                        <div class="flex items-start gap-4">
+
+                            <div class="w-10 h-10 shrink-0 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                <i data-lucide="shield" class="w-5 h-5 text-emerald-500"></i>
+                            </div>
+
+                            <div>
+
+                                <h3 class="text-lg font-semibold">
+                                    Security & Privacy
+                                </h3>
+
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-6">
+                                    Security reports may contain sensitive information.
+                                    Always verify that uploaded reports are appropriate
+                                    for the environment in which the application is being used.
+                                </p>
+
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-4 leading-6">
+                                    The exact storage, retention, and processing behavior
+                                    depends on the backend configuration of the application.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- BACK BUTTON -->
+                    <div class="flex justify-center pt-2 pb-6">
+
+                        <a
+                            href="AnalyzeReport.html"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition"
+                        >
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            Back to Analyze Report
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- LUCIDE -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

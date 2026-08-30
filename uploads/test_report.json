@@ -1,0 +1,29 @@
+{
+  "target": "https://demo.example.com",
+  "assessment_type": "Web Application Security Assessment",
+  "overall_risk": "High",
+  "risk_score": 82,
+  "findings": [
+    {
+      "id": "001",
+      "title": "SQL Injection",
+      "severity": "Critical",
+      "endpoint": "/api/users",
+      "recommendation": "Use parameterized queries or prepared statements."
+    },
+    {
+      "id": "002",
+      "title": "Cross-Site Scripting",
+      "severity": "High",
+      "endpoint": "/search",
+      "recommendation": "Apply context-aware output encoding."
+    },
+    {
+      "id": "003",
+      "title": "Missing Security Headers",
+      "severity": "Medium",
+      "endpoint": "/",
+      "recommendation": "Configure appropriate HTTP security headers."
+    }
+  ]
+}
