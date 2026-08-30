@@ -782,7 +782,7 @@ def update_finding_status(filename: str, finding_id: str, status: str):
 @app.get("/")
 def serve_index():
     return FileResponse(
-        os.path.join(BASE_DIR, "index.html")
+        os.path.join(BASE_DIR, "dashboard.html")
     )
 
 @app.get("/{page_name}.html")
