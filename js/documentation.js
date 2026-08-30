@@ -1,145 +1,131 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const backToRemediation = document.getElementById("backToRemediation");
-    backToRemediation.addEventListener("click", () => {
-        window.location.href = "AI_Remediation.html";
-    });
-    const selectedFinding = JSON.parse(
-        localStorage.getItem("selectedFinding")
-    );
-    console.log("DOCUMENTATION FINDING:", selectedFinding);
-    if (!selectedFinding) {
-        document.getElementById("documentationTitle").textContent =
-            "No finding selected";
-        return;
+document.addEventListener("DOMContentLoaded", async () => {
+    if (typeof applySavedTheme === "function") {
+        applySavedTheme();
     }
-    document.getElementById("documentationTitle").textContent =
-        `${selectedFinding.title} Documentation`;
 
-    const documentation = {
-        "SQL Injection": {
-            description:
-                "SQL Injection is a web security vulnerability that occurs when an application includes untrusted user input directly inside a database query. An attacker may manipulate the input to change the intended SQL query.",
-            impact:
-                "An attacker may be able to access unauthorized data, modify or delete database records, bypass authentication, or potentially compromise the underlying database.",
-            prevention:
-                "Use parameterized queries or prepared statements instead of constructing SQL queries using string concatenation. Validate and sanitize input where appropriate, use least-privilege database accounts, and avoid exposing detailed database errors to users.",
-            references:
-                "OWASP SQL Injection Prevention Cheat Sheet"
-        },
+    const backToRemediation = document.getElementById("backToRemediation");
+    if (backToRemediation) {
+        backToRemediation.addEventListener("click", () => {
+            window.location.href = "AI_Remediation.html";
+        });
+    }
 
+    let selectedFinding = null;
+    try {
+        selectedFinding = JSON.parse(localStorage.getItem("selectedFinding"));
+    } catch (e) {
+        selectedFinding = null;
+    }
 
-        "Cross-Site Scripting (XSS)": {
-            description:
-                "Cross-Site Scripting (XSS) occurs when an application allows untrusted input to be inserted into a web page and executed as JavaScript in another user's browser.",
-            impact:
-                "Successful XSS attacks may allow attackers to steal session information, manipulate page content, perform actions on behalf of users, or redirect users to malicious websites.",
-            prevention:
-                "Properly encode output before displaying user-controlled data, validate input, use appropriate Content Security Policy headers, and avoid inserting untrusted content directly into HTML or JavaScript.",
-            references:
-                "OWASP Cross-Site Scripting Prevention Cheat Sheet"
-        },
-
-
-        "Missing Security Headers": {
-            description:
-                "Security headers are HTTP response headers that instruct browsers to apply additional security protections when interacting with a web application.",
-            impact:
-                "Missing security headers can increase the risk of attacks such as clickjacking, content injection, MIME-type confusion, and certain types of cross-site scripting attacks.",
-            prevention:
-                "Configure appropriate security headers such as Content-Security-Policy, X-Content-Type-Options, X-Frame-Options or frame-ancestors, Strict-Transport-Security, and Referrer-Policy.",
-            references:
-                "OWASP Secure Headers Project"
-        },
-
-
-        "Weak Password Policy": {
-            description:
-                "A weak password policy allows users to create passwords that are short, predictable, reused, or otherwise easy for attackers to guess or crack.",
-
-            impact:
-                "Weak passwords can increase the likelihood of account compromise through password guessing, credential stuffing, brute-force attacks, or the use of previously leaked credentials.",
-
-            prevention:
-                "Require sufficiently long passwords, prevent the use of commonly compromised passwords, implement appropriate rate limiting, and support multi-factor authentication where possible.",
-
-            references:
-                "OWASP Authentication Cheat Sheet"
-        },
-
-
-        "Information Disclosure": {
-            description:
-                "Information disclosure occurs when an application unintentionally exposes sensitive or unnecessary information to users or attackers.",
-
-            impact:
-                "Exposed information may help attackers understand the application's internal structure, identify technologies and versions, discover sensitive data, or prepare more targeted attacks.",
-
-            prevention:
-                "Avoid exposing sensitive information in error messages, API responses, source code, logs, and HTTP headers. Use generic error messages and carefully control the information returned by the application.",
-
-            references:
-                "OWASP Information Exposure"
+    if (!selectedFinding) {
+        try {
+            const apiUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data && data.findings && data.findings.length > 0) {
+                selectedFinding = data.findings[0];
+                localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
+            }
+        } catch (err) {
+            console.error("Error fetching fallback documentation finding:", err);
         }
+    }
 
-    };
-
-
-    const info = documentation[selectedFinding.title];
-    if (!info) {
+    const titleElem = document.getElementById("documentationTitle");
+    if (!selectedFinding) {
+        if (titleElem) titleElem.textContent = "Security Vulnerability Documentation";
         document.getElementById("documentationDescription").innerHTML = `
-            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-                Documentation
-            </h2>
-
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                Documentation for this finding is not available yet.
-            </p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Please select a finding from the Dashboard or Findings page to view detailed documentation.</p>
         `;
         return;
     }
 
+    if (titleElem) {
+        titleElem.textContent = `${selectedFinding.title} Documentation`;
+    }
+
+    const documentation = {
+        "SQL Injection": {
+            description: "SQL Injection is a web security vulnerability that occurs when an application includes untrusted user input directly inside a database query. An attacker may manipulate the input to execute arbitrary SQL commands.",
+            impact: "An attacker may gain unauthorized access to data, modify or delete database records, bypass authentication controls, or compromise the underlying server.",
+            prevention: "Use parameterized queries or prepared statements instead of constructing SQL queries using string concatenation. Validate and sanitize user input, enforce least-privilege access on database accounts.",
+            references: "OWASP SQL Injection Prevention Cheat Sheet"
+        },
+        "Cross-Site Scripting (XSS)": {
+            description: "Cross-Site Scripting (XSS) occurs when an application inserts untrusted input into a web page without proper encoding, executing malicious scripts in client browsers.",
+            impact: "Attackers can steal session cookies, hijack user sessions, manipulate page content, or redirect users to malicious domains.",
+            prevention: "Apply contextual output encoding (HTML, attribute, JS encoding), implement Content Security Policy (CSP) headers, and validate input.",
+            references: "OWASP Cross-Site Scripting Prevention Cheat Sheet"
+        },
+        "Missing Security Headers": {
+            description: "Security headers instruct client browsers to activate built-in defense mechanisms against common web application threats.",
+            impact: "Increases risk of clickjacking, MIME-type sniffing, cross-site scripting, and unauthorized framing.",
+            prevention: "Configure response headers such as Content-Security-Policy, X-Content-Type-Options, X-Frame-Options, and Strict-Transport-Security.",
+            references: "OWASP Secure Headers Project"
+        },
+        "Weak Password Policy": {
+            description: "A weak password policy allows users to set short, easily guessable, or reused passwords.",
+            impact: "Increases vulnerability to brute-force, dictionary, and credential stuffing attacks.",
+            prevention: "Enforce a minimum password length (e.g. 12+ characters), check against breach databases, and mandate multi-factor authentication.",
+            references: "OWASP Authentication Cheat Sheet"
+        },
+        "Information Disclosure": {
+            description: "Information disclosure occurs when sensitive implementation details, stack traces, or server version headers are exposed to untrusted users.",
+            impact: "Provides attackers with technical details needed to craft targeted exploits against the system.",
+            prevention: "Disable verbose error responses, mask framework headers, and log detailed exception traces internally.",
+            references: "OWASP Information Exposure Guide"
+        }
+    };
+
+    let info = documentation[selectedFinding.title];
+    if (!info) {
+        const titleLower = (selectedFinding.title || "").toLowerCase();
+        if (titleLower.includes("sql") || titleLower.includes("injection")) {
+            info = documentation["SQL Injection"];
+        } else if (titleLower.includes("xss") || titleLower.includes("script")) {
+            info = documentation["Cross-Site Scripting (XSS)"];
+        } else if (titleLower.includes("header")) {
+            info = documentation["Missing Security Headers"];
+        } else if (titleLower.includes("password") || titleLower.includes("auth")) {
+            info = documentation["Weak Password Policy"];
+        } else {
+            info = documentation["Information Disclosure"];
+        }
+    }
 
     document.getElementById("documentationDescription").innerHTML = `
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
             What is ${selectedFinding.title}?
         </h2>
-
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
             ${info.description}
         </p>
     `;
 
-
     document.getElementById("documentationImpact").innerHTML = `
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
             Impact
         </h2>
-
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
             ${info.impact}
         </p>
     `;
 
-
     document.getElementById("documentationPrevention").innerHTML = `
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Prevention
+            Prevention & Mitigation
         </h2>
-
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
             ${info.prevention}
         </p>
     `;
 
-
     document.getElementById("documentationReferences").innerHTML = `
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Further Reading
+            Further Reading & References
         </h2>
-
-        <p class="mt-2 text-sm text-blue-500 dark:text-blue-400">
+        <p class="mt-2 text-sm font-medium text-blue-500 dark:text-blue-400">
             ${info.references}
         </p>
     `;
-
 });
