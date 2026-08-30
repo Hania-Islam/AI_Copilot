@@ -1179,3 +1179,60 @@ async function deleteIntegration(integrationId) {
     }
 }
 
+function initSettingsNavigation() {
+    const settingMap = {
+        profile: "profileSection",
+        notifications: "notificationsSection",
+        appearance: "appearanceSection",
+        api: "apiSection",
+        security: "securitySection",
+        dataPrivacy: "dataPrivacySection",
+        about: "aboutSection"
+    };
+
+    const buttons = document.querySelectorAll(".settingNav");
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            const settingKey = button.getAttribute("data-setting");
+            const targetId = settingMap[settingKey];
+            const targetElem = document.getElementById(targetId);
+
+            if (targetElem) {
+                targetElem.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+
+            buttons.forEach(b => {
+                b.classList.remove("bg-blue-500/10");
+                const icon = b.querySelector("i");
+                if (icon) {
+                    icon.classList.remove("text-blue-500");
+                    icon.classList.add("text-slate-500", "dark:text-slate-400");
+                }
+            });
+
+            button.classList.add("bg-blue-500/10");
+            const activeIcon = button.querySelector("i");
+            if (activeIcon) {
+                activeIcon.classList.remove("text-slate-500", "dark:text-slate-400");
+                activeIcon.classList.add("text-blue-500");
+            }
+        });
+    });
+
+    if (window.location.hash) {
+        const hashId = window.location.hash.substring(1);
+        const target = document.getElementById(hashId);
+        if (target) {
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 300);
+        }
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSettingsNavigation);
+} else {
+    initSettingsNavigation();
+}
+
