@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+async function initDocumentation() {
     if (typeof applySavedTheme === "function") {
         applySavedTheme();
     }
@@ -34,9 +34,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const titleElem = document.getElementById("documentationTitle");
     if (!selectedFinding) {
         if (titleElem) titleElem.textContent = "Security Vulnerability Documentation";
-        document.getElementById("documentationDescription").innerHTML = `
-            <p class="text-sm text-slate-600 dark:text-slate-400">Please select a finding from the Dashboard or Findings page to view detailed documentation.</p>
-        `;
+        const descElem = document.getElementById("documentationDescription");
+        if (descElem) {
+            descElem.innerHTML = `<p class="text-sm text-slate-600 dark:text-slate-400">Please select a finding from the Dashboard or Findings page to view detailed documentation.</p>`;
+        }
         return;
     }
 
@@ -93,39 +94,57 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    document.getElementById("documentationDescription").innerHTML = `
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            What is ${selectedFinding.title}?
-        </h2>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            ${info.description}
-        </p>
-    `;
+    const descElem = document.getElementById("documentationDescription");
+    if (descElem) {
+        descElem.innerHTML = `
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+                What is ${selectedFinding.title}?
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                ${info.description}
+            </p>
+        `;
+    }
 
-    document.getElementById("documentationImpact").innerHTML = `
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Impact
-        </h2>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            ${info.impact}
-        </p>
-    `;
+    const impactElem = document.getElementById("documentationImpact");
+    if (impactElem) {
+        impactElem.innerHTML = `
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+                Impact
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                ${info.impact}
+            </p>
+        `;
+    }
 
-    document.getElementById("documentationPrevention").innerHTML = `
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Prevention & Mitigation
-        </h2>
-        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            ${info.prevention}
-        </p>
-    `;
+    const prevElem = document.getElementById("documentationPrevention");
+    if (prevElem) {
+        prevElem.innerHTML = `
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+                Prevention & Mitigation
+            </h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                ${info.prevention}
+            </p>
+        `;
+    }
 
-    document.getElementById("documentationReferences").innerHTML = `
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            Further Reading & References
-        </h2>
-        <p class="mt-2 text-sm font-medium text-blue-500 dark:text-blue-400">
-            ${info.references}
-        </p>
-    `;
-});
+    const refElem = document.getElementById("documentationReferences");
+    if (refElem) {
+        refElem.innerHTML = `
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+                Further Reading & References
+            </h2>
+            <p class="mt-2 text-sm font-medium text-blue-500 dark:text-blue-400">
+                ${info.references}
+            </p>
+        `;
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDocumentation);
+} else {
+    initDocumentation();
+}
