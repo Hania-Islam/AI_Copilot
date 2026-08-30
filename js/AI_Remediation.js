@@ -1,4 +1,6 @@
-applySavedTheme();
+if (typeof applySavedTheme === "function") {
+    applySavedTheme();
+}
 let selectedFinding = null;
 try {
     selectedFinding = JSON.parse(localStorage.getItem("selectedFinding"));
@@ -6,7 +8,7 @@ try {
     selectedFinding = null;
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function initAIRemediation() {
     if (!selectedFinding || !selectedFinding.title) {
         console.log("NO VALID SELECTED FINDING FOUND, FETCHING DEFAULT FROM BACKEND...");
         try {
@@ -38,11 +40,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
         localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
     }
-    document.getElementById("remediationFindingTitle").textContent =selectedFinding.title;
-    document.getElementById("remediationFindingId").textContent =`Finding ID: ${selectedFinding.id}`;
-    document.getElementById("remediationFindingSeverity").textContent =selectedFinding.severity;
+    const elemTitle = document.getElementById("remediationFindingTitle");
+    if (elemTitle) elemTitle.textContent = selectedFinding.title || "";
+    const elemId = document.getElementById("remediationFindingId");
+    if (elemId) elemId.textContent = `Finding ID: ${selectedFinding.id || 1}`;
+    const elemSev = document.getElementById("remediationFindingSeverity");
+    if (elemSev) elemSev.textContent = selectedFinding.severity || "Critical";
     const severityBadge = document.getElementById("remediationFindingSeverity");
-    severityBadge.classList.remove(
+    if (severityBadge) {
+        severityBadge.classList.remove(
         "bg-red-100",
         "dark:bg-red-500/20",
         "text-red-500",
@@ -90,16 +96,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             "dark:text-green-400"
         );
     }
-    document.getElementById("remediationFindingDate").textContent =`• Detected on ${selectedFinding.date_detected}`;
-    document.getElementById("remediationFindingEndpoint").textContent =selectedFinding.endpoint;
-    document.getElementById("remediationFindingType").textContent =selectedFinding.type;
-    document.getElementById("remediationFindingCvss").textContent =selectedFinding.cvss;
-    document.getElementById("vulnerabilityDescription").textContent =selectedFinding.description;
-    document.getElementById("aiAnalysisSummary").textContent =`The ${selectedFinding.title} vulnerability was identified at ${selectedFinding.endpoint}. ${selectedFinding.description}`;
-    document.getElementById("whyDangerous").textContent =selectedFinding.evidence;
-    const severityAssessment =document.getElementById("severityAssessment");
-    severityAssessment.textContent = selectedFinding.severity;
-    severityAssessment.classList.remove(
+    const elemDate = document.getElementById("remediationFindingDate");
+    if (elemDate) elemDate.textContent = `• Detected on ${selectedFinding.date_detected || ''}`;
+    const elemEndpoint = document.getElementById("remediationFindingEndpoint");
+    if (elemEndpoint) elemEndpoint.textContent = selectedFinding.endpoint || '';
+    const elemType = document.getElementById("remediationFindingType");
+    if (elemType) elemType.textContent = selectedFinding.type || '';
+    const elemCvss = document.getElementById("remediationFindingCvss");
+    if (elemCvss) elemCvss.textContent = selectedFinding.cvss || '';
+    const elemDesc = document.getElementById("vulnerabilityDescription");
+    if (elemDesc) elemDesc.textContent = selectedFinding.description || '';
+    const elemSummary = document.getElementById("aiAnalysisSummary");
+    if (elemSummary) elemSummary.textContent = `The ${selectedFinding.title} vulnerability was identified at ${selectedFinding.endpoint}. ${selectedFinding.description}`;
+    const elemWhy = document.getElementById("whyDangerous");
+    if (elemWhy) elemWhy.textContent = selectedFinding.evidence || '';
+    const severityAssessment = document.getElementById("severityAssessment");
+    if (severityAssessment) {
+        severityAssessment.textContent = selectedFinding.severity || '';
+        severityAssessment.classList.remove(
         "bg-red-100",
         "dark:bg-red-500/20",
         "text-red-500",
@@ -677,7 +691,13 @@ if (viewDocumentationBtn) {
         window.location.href = "findings_documentation.html";
     });
 }
-});
+} // end initAIRemediation
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAIRemediation);
+} else {
+    initAIRemediation();
+}
 
 function initTabs() {
     const aiAnalysisTab = document.getElementById("aiAnalysisTab");
