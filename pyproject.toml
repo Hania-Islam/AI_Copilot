@@ -1,2 +1,13 @@
+[project]
+name = "ai-copilot"
+version = "0.1.0"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pypdf",
+    "python-multipart"
+]
+
 [tool.vercel]
 entrypoint = "backend.main:app"
