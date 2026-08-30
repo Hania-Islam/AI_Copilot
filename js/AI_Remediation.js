@@ -688,8 +688,7 @@ if (copySecureCode) {
 
 const viewDocumentationBtn = document.getElementById("viewDocumentationBtn");
 if (viewDocumentationBtn) {
-    viewDocumentationBtn.addEventListener("click", (e) => {
-        e.preventDefault();
+    viewDocumentationBtn.addEventListener("click", () => {
         window.location.href = "findings_documentation.html";
     });
 }
