@@ -40,14 +40,25 @@ app.mount(
 )
 
 HISTORY_FILE = os.path.join(BASE_DIR, "upload_history.json")
+
 def load_history():
-    if not os.path.exists(HISTORY_FILE):
-        return []
-    try:
-        with open(HISTORY_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
-    except:
-        return []
+    candidates = [
+        HISTORY_FILE,
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "upload_history.json"),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "upload_history.json"),
+        os.path.join(os.getcwd(), "upload_history.json"),
+        "/tmp/upload_history.json"
+    ]
+    for filepath in candidates:
+        if os.path.exists(filepath):
+            try:
+                with open(filepath, "r", encoding="utf-8") as file:
+                    data = json.load(file)
+                    if data:
+                        return data
+            except Exception as e:
+                print("Error loading history from", filepath, e)
+    return []
 
 def save_history(history):
     with open(HISTORY_FILE, "w", encoding="utf-8") as file:

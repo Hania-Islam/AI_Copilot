@@ -1,11 +1,29 @@
-applySavedTheme()
-const selectedFinding = JSON.parse( localStorage.getItem("selectedFinding"));
-console.log("AI REMEDIATION PAGE FINDING:", selectedFinding);
-console.log("SELECTED FINDING CVSS:", selectedFinding.cvss);
+applySavedTheme();
+let selectedFinding = null;
+try {
+    selectedFinding = JSON.parse(localStorage.getItem("selectedFinding"));
+} catch (e) {
+    selectedFinding = null;
+}
 
-document.addEventListener("DOMContentLoaded", async() => {
+document.addEventListener("DOMContentLoaded", async () => {
     if (!selectedFinding) {
-        console.log("NO SELECTED FINDING FOUND");
+        console.log("NO SELECTED FINDING FOUND, FETCHING DEFAULT FROM BACKEND...");
+        try {
+            const apiUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
+            const res = await fetch(apiUrl);
+            const data = await res.json();
+            if (data && data.findings && data.findings.length > 0) {
+                selectedFinding = data.findings[0];
+                localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
+            }
+        } catch (err) {
+            console.error("FAILED TO FETCH DEFAULT FINDING:", err);
+        }
+    }
+
+    if (!selectedFinding) {
+        console.log("STILL NO FINDING AVAILABLE");
         return;
     }
     document.getElementById("remediationFindingTitle").textContent =selectedFinding.title;
