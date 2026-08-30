@@ -60,13 +60,29 @@ function setNotificationState(buttonId, enabled) {
         circle.classList.add("left-0.5")
     }
 }
+
+function initNotificationToggles() {
+    const toggleIds = ["emailNotifBtn", "securityAlertBtn", "reportsBtn", "updatesBtn"];
+    toggleIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn && !btn.dataset.toggleInitialized) {
+            btn.dataset.toggleInitialized = "true";
+            btn.addEventListener("click", () => {
+                const isCurrentlyOn = btn.classList.contains("bg-blue-600");
+                setNotificationState(id, !isCurrentlyOn);
+            });
+        }
+    });
+}
+
 loadProfile();
-loadNotificationSettings()
-loadTheme()
-loadSecuritySettings()
-loadActiveSessions()
-loadActiveSessionCount()
-loadApiConfiguration()
+loadNotificationSettings();
+initNotificationToggles();
+loadTheme();
+loadSecuritySettings();
+loadActiveSessions();
+loadActiveSessionCount();
+loadApiConfiguration();
 
 const saveChangesBtn=document.getElementById("saveChangesBtn")
 saveChangesBtn.addEventListener("click", async () => {
@@ -537,16 +553,18 @@ async function loadSecuritySettings() {
             }
         }
         // Active Sessions
-        const activeSessionsCount =document.getElementById("activeSessionsCount")
-        const modalActiveSessionsCount =document.getElementById("modalActiveSessionsCount")
+        const activeSessionsCount = document.getElementById("activeSessionsCount")
+        const modalActiveSessionsCount = document.getElementById("modalActiveSessionsCount")
+
+        const sessionCount = Array.isArray(security.active_sessions)
+            ? security.active_sessions.length
+            : (typeof security.active_sessions === 'number' ? security.active_sessions : (security.active_sessions ? 1 : 0));
 
         if (activeSessionsCount) {
-            activeSessionsCount.textContent =
-                security.active_sessions
+            activeSessionsCount.textContent = sessionCount
         }
         if (modalActiveSessionsCount) {
-            modalActiveSessionsCount.textContent =
-                security.active_sessions
+            modalActiveSessionsCount.textContent = sessionCount
         }
     } catch (error) {
         console.error(
@@ -554,6 +572,27 @@ async function loadSecuritySettings() {
             error
         )
     }
+}
+
+const securitySettingsBtn = document.getElementById("securitySettingsBtn");
+const securityModal = document.getElementById("securityModal");
+const closeSecurityModal = document.getElementById("closeSecurityModal");
+const securityModalOverlay = document.getElementById("securityModalOverlay");
+
+if (securitySettingsBtn && securityModal) {
+    securitySettingsBtn.addEventListener("click", () => {
+        securityModal.classList.remove("hidden");
+    });
+}
+if (closeSecurityModal && securityModal) {
+    closeSecurityModal.addEventListener("click", () => {
+        securityModal.classList.add("hidden");
+    });
+}
+if (securityModalOverlay && securityModal) {
+    securityModalOverlay.addEventListener("click", () => {
+        securityModal.classList.add("hidden");
+    });
 }
 
 const twoFactorBtn = document.getElementById("twoFactorBtn")
