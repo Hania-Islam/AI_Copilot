@@ -18,7 +18,7 @@ async function initDocumentation() {
     }
 
     // Immediate fallback so page renders instantly without waiting for network
-    if (!selectedFinding) {
+    if (!selectedFinding || !selectedFinding.title) {
         selectedFinding = {
             id: 1,
             title: "SQL Injection",

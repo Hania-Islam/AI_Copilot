@@ -7,8 +7,8 @@ try {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    if (!selectedFinding) {
-        console.log("NO SELECTED FINDING FOUND, FETCHING DEFAULT FROM BACKEND...");
+    if (!selectedFinding || !selectedFinding.title) {
+        console.log("NO VALID SELECTED FINDING FOUND, FETCHING DEFAULT FROM BACKEND...");
         try {
             const apiUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
             const res = await fetch(apiUrl);
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    if (!selectedFinding) {
+    if (!selectedFinding || !selectedFinding.title) {
         selectedFinding = {
             id: 1,
             title: "SQL Injection",
@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             status: "Open",
             filename: "report.pdf"
         };
+        localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
     }
     document.getElementById("remediationFindingTitle").textContent =selectedFinding.title;
     document.getElementById("remediationFindingId").textContent =`Finding ID: ${selectedFinding.id}`;
