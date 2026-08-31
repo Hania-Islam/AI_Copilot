@@ -1,21 +1,39 @@
 applySavedTheme()
 async function loadProfile() {
     try {
-        const response = await fetch(window.getApiUrl("/settings/profile"));
-        const profile = await response.json();
-
-        document.getElementById("name").value = profile.name;
-        document.getElementById("email").value = profile.email;
-        document.getElementById("username").value = profile.username;
-        document.getElementById("role").value = profile.role;
-
+        const cachedPic = localStorage.getItem("user_profile_pic");
         const profilePic = document.getElementById("profilePic");
         const defaultProfileIcon = document.getElementById("defaultProfileIcon");
 
-        if (profile.profile_picture) {
-            profilePic.src = window.getApiUrl(`/profile-pictures/${profile.profile_picture}`);
+        if (cachedPic && profilePic) {
+            profilePic.src = cachedPic;
             profilePic.classList.remove("hidden");
-            defaultProfileIcon.classList.add("hidden");
+            if (defaultProfileIcon) defaultProfileIcon.classList.add("hidden");
+        }
+
+        const response = await fetch(window.getApiUrl("/settings/profile"));
+        if (!response.ok) return;
+        const profile = await response.json();
+
+        if (profile.name && document.getElementById("name")) document.getElementById("name").value = profile.name;
+        if (profile.email && document.getElementById("email")) document.getElementById("email").value = profile.email;
+        if (profile.username && document.getElementById("username")) document.getElementById("username").value = profile.username;
+        if (profile.role && document.getElementById("role")) document.getElementById("role").value = profile.role;
+
+        let picSrc = profile.profile_picture_url;
+        if (!picSrc && profile.profile_picture) {
+            if (profile.profile_picture.startsWith("data:")) {
+                picSrc = profile.profile_picture;
+            } else {
+                picSrc = window.getApiUrl(`/profile-pictures/${profile.profile_picture}`);
+            }
+        }
+
+        if (picSrc && profilePic) {
+            profilePic.src = picSrc;
+            profilePic.classList.remove("hidden");
+            if (defaultProfileIcon) defaultProfileIcon.classList.add("hidden");
+            localStorage.setItem("user_profile_pic", picSrc);
         }
     } catch (error) {
         console.error("Error loading profile:", error);
@@ -127,36 +145,47 @@ editProfilePicBtn.addEventListener("click", () => {
     profilePicInput.click()
 })
 profilePicInput.addEventListener("change", async () => {
-    const file = profilePicInput.files[0]
-    if (!file) {
-        return
-    }
-    const formData = new FormData()
-    formData.append("file", file)
+    const file = profilePicInput.files[0];
+    if (!file) return;
+
+    const profilePic = document.getElementById("profilePic");
+    const defaultProfileIcon = document.getElementById("defaultProfileIcon");
+
+    // Local instant preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (profilePic) {
+            profilePic.src = e.target.result;
+            profilePic.classList.remove("hidden");
+            if (defaultProfileIcon) defaultProfileIcon.classList.add("hidden");
+            localStorage.setItem("user_profile_pic", e.target.result);
+        }
+    };
+    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("file", file);
     try {
-        const response = await fetch(window.getApiUrl("/settings/profile-picture"),
-            {
-                method: "POST",
-                body: formData
-            }
-        )
+        const response = await fetch(window.getApiUrl("/settings/profile-picture"), {
+            method: "POST",
+            body: formData
+        });
         if (!response.ok) {
             const errText = await response.text();
             console.error("Upload failed server error:", response.status, errText);
-            alert("Failed to upload profile picture. Server returned an error.");
             return;
         }
-        const data = await response.json()
-        console.log("Profile picture uploaded:", data)
-        const profilePic = document.getElementById("profilePic")
-        const defaultProfileIcon = document.getElementById("defaultProfileIcon")
-        if (profilePic && data.filename) {
-            profilePic.src = window.getApiUrl(`/profile-pictures/${data.filename}`)
-            profilePic.classList.remove("hidden")
-            if (defaultProfileIcon) defaultProfileIcon.classList.add("hidden") 
+        const data = await response.json();
+        console.log("Profile picture uploaded:", data);
+        const finalSrc = data.profile_picture || data.profile_picture_url || window.getApiUrl(`/profile-pictures/${data.filename}`);
+        if (profilePic && finalSrc) {
+            profilePic.src = finalSrc;
+            profilePic.classList.remove("hidden");
+            if (defaultProfileIcon) defaultProfileIcon.classList.add("hidden");
+            localStorage.setItem("user_profile_pic", finalSrc);
         }
     } catch (error) {
-        console.error("Error uploading profile picture:", error)
+        console.error("Error uploading profile picture:", error);
     }
 })
 

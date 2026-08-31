@@ -162,10 +162,16 @@ def update_profile(profile: dict):
         "profile": settings
     }
     
+import base64
+
 @app.post("/settings/profile-picture")
 async def upload_profile_picture(file: UploadFile = File(...)):
     content = await file.read()
     filename = file.filename
+    
+    encoded = base64.b64encode(content).decode("utf-8")
+    content_type = file.content_type or "image/png"
+    data_url = f"data:{content_type};base64,{encoded}"
     
     upload_folder = os.path.join(BASE_DIR, "profile_pictures")
     file_path = os.path.join(upload_folder, filename)
@@ -185,11 +191,13 @@ async def upload_profile_picture(file: UploadFile = File(...)):
 
     settings = load_settings()
     settings["profile_picture"] = filename
+    settings["profile_picture_url"] = data_url
     save_settings(settings)
 
     return {
         "message": "Profile picture uploaded successfully",
-        "filename": filename
+        "filename": filename,
+        "profile_picture": data_url
     }
 
 @app.get("/profile-pictures/{filename}")
