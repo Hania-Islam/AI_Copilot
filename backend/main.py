@@ -839,24 +839,40 @@ async def upload_file(file: UploadFile = File(...)):
     extension = os.path.splitext(file.filename)[1].lower()
     print("FILE TYPE:", extension)
             
-    upload_folder = os.path.join(BASE_DIR, "uploads")
-    os.makedirs(upload_folder, exist_ok=True)
-    file_path = os.path.join(upload_folder, file.filename)
+    content = await file.read()
+    file_size = len(content)
+    file_size_mb = round(file_size / (1024 * 1024), 2)
 
-    print("SAVING FILE TO:", file_path)
+    # Save to disk with Vercel /tmp fallback for read-only filesystem
+    try:
+        upload_folder = os.path.join(BASE_DIR, "uploads")
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, file.filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+    except Exception as save_err:
+        print("Could not save file to BASE_DIR/uploads (Vercel read-only filesystem):", save_err)
+        try:
+            tmp_upload_folder = "/tmp/uploads"
+            os.makedirs(tmp_upload_folder, exist_ok=True)
+            tmp_file_path = os.path.join(tmp_upload_folder, file.filename)
+            with open(tmp_file_path, "wb") as buffer:
+                buffer.write(content)
+        except Exception:
+            pass
 
-    with open(file_path, "wb") as buffer:
-        content = await file.read()
-        buffer.write(content)
-        file_size = len(content)
-        file_size_mb = round(file_size / (1024 * 1024), 2)
+    # Extract text content cleanly
+    report_text = ""
     if file.filename.lower().endswith(".pdf"):
-        reader = PdfReader(io.BytesIO(content))
-        report_text = ""
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                report_text += text + "\n"
+        try:
+            reader = PdfReader(io.BytesIO(content))
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    report_text += text + "\n"
+        except Exception as pdf_err:
+            print("PDF reading error, falling back to text decoding:", pdf_err)
+            report_text = content.decode("utf-8", errors="ignore")
     else:
         report_text = content.decode("utf-8", errors="ignore")
     
