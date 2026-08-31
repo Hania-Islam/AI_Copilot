@@ -140,17 +140,20 @@ profilePicInput.addEventListener("change", async () => {
                 body: formData
             }
         )
+        if (!response.ok) {
+            const errText = await response.text();
+            console.error("Upload failed server error:", response.status, errText);
+            alert("Failed to upload profile picture. Server returned an error.");
+            return;
+        }
         const data = await response.json()
-        if (response.ok) {
-            console.log("Profile picture uploaded:", data)
-            const profilePicContainer = document.getElementById("profilePicContainer")
-            const profilePic = document.getElementById("profilePic")
-            const defaultProfileIcon = document.getElementById("defaultProfileIcon")
+        console.log("Profile picture uploaded:", data)
+        const profilePic = document.getElementById("profilePic")
+        const defaultProfileIcon = document.getElementById("defaultProfileIcon")
+        if (profilePic && data.filename) {
             profilePic.src = window.getApiUrl(`/profile-pictures/${data.filename}`)
             profilePic.classList.remove("hidden")
-            defaultProfileIcon.classList.add("hidden") 
-        } else {
-            console.error("Upload failed:", data)
+            if (defaultProfileIcon) defaultProfileIcon.classList.add("hidden") 
         }
     } catch (error) {
         console.error("Error uploading profile picture:", error)
@@ -1012,8 +1015,7 @@ if (toggleApiKey) {
 // REGENERATE API KEY
 if (regenerateApiKeyBtn) {
     regenerateApiKeyBtn.addEventListener("click", async () => {
-        const confirmed = confirm("Are you sure you want to regenerate your API key? The old key will no longer be valid."
-        )
+        const confirmed = confirm("Are you sure you want to regenerate your API key? The old key will no longer be valid.")
         if (!confirmed) {
             return
         }
@@ -1023,18 +1025,18 @@ if (regenerateApiKeyBtn) {
                     method: "POST"
                 }
             )
-            const data = await response.json()
-            if (response.ok) {
-                apiKeyInput.value = data.api_key
-                console.log("API KEY REGENERATED:", data)
-                alert("API key regenerated successfully.")
-            } else {
-                console.error("Failed to regenerate API key:",data
-                )
-                alert("Failed to regenerate API key.")
+            if (!response.ok) {
+                const errText = await response.text();
+                console.error("Failed to regenerate API key server error:", response.status, errText);
+                alert("Failed to regenerate API key.");
+                return;
             }
+            const data = await response.json()
+            apiKeyInput.value = data.api_key
+            console.log("API KEY REGENERATED:", data)
+            alert("API key regenerated successfully.")
         } catch (error) {
-            console.error("Error regenerating API key:",error)
+            console.error("Error regenerating API key:", error)
             alert("Could not connect to the backend.")
         }
     })

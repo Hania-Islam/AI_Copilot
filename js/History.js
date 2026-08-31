@@ -263,30 +263,35 @@ async function loadHistory() {
             if (recentActivity) {
                 const recentUploads = uploads.slice(0, 4);
                 recentActivity.innerHTML = "";
-                recentUploads.forEach(upload => {
-                 const activity = document.createElement("div");
-                 const formattedTime = formatUploadTime(upload.upload_time);
-                 activity.className = "grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-3 items-start";
-                 activity.innerHTML = `
-                 <i data-lucide="circle-check"
-                    class="w-4 h-4 text-green-500 mt-1 shrink-0"></i>
-             
-                 <div class="min-w-0">
-                     <p class="text-xs text-slate-900 dark:text-white/85 font-semibold leading-4 break-words">
-                         ${upload.filename}
-                     </p>
-             
-                     <p class="text-[10px] text-slate-500 dark:text-white/60 mt-0.5">
-                         Analysis completed
-                     </p>
-                 </div>
-             
-                 <p class="text-[9px] text-slate-500 dark:text-white/50 whitespace-nowrap mt-1">
-                       ${formattedTime.time}
-                 </p>
-             `;
-            });
-    }
+                if (recentUploads.length === 0) {
+                    recentActivity.innerHTML = `<p class="text-xs text-slate-500 dark:text-slate-400 text-center py-4">No recent activity</p>`;
+                } else {
+                    recentUploads.forEach(upload => {
+                        const activity = document.createElement("div");
+                        const formattedTime = formatUploadTime(upload.upload_time);
+                        activity.className = "grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-3 items-start p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/40 transition";
+                        activity.innerHTML = `
+                        <i data-lucide="circle-check"
+                           class="w-4 h-4 text-green-500 mt-1 shrink-0"></i>
+                    
+                        <div class="min-w-0">
+                            <p class="text-xs text-slate-900 dark:text-white/85 font-semibold leading-4 break-words">
+                                ${upload.filename}
+                            </p>
+                    
+                            <p class="text-[10px] text-slate-500 dark:text-white/60 mt-0.5">
+                                Analysis completed
+                            </p>
+                        </div>
+                    
+                        <p class="text-[9px] text-slate-500 dark:text-white/50 whitespace-nowrap mt-1">
+                              ${formattedTime.time}
+                        </p>
+                    `;
+                        recentActivity.appendChild(activity);
+                    });
+                }
+            }
     if (typeof lucide !== "undefined") {
         lucide.createIcons();
     }
@@ -333,10 +338,17 @@ function getFileStyle(fileType) {
     };
 }
 function formatUploadTime(uploadTime) {
-    const [date, time, period] = uploadTime.split(" ");
+    if (!uploadTime) return { date: "-", time: "-" };
+    const parts = String(uploadTime).trim().split(" ");
+    if (parts.length >= 3) {
+        return {
+            date: parts[0],
+            time: `${parts[1]} ${parts[2]}`
+        };
+    }
     return {
-        date: date,
-        time: `${time} ${period}`
+        date: parts[0] || uploadTime,
+        time: parts[1] || uploadTime
     };
 }
 function calculateRiskScore(findings) {

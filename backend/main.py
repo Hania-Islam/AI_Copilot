@@ -141,67 +141,79 @@ def get_profile():
         "avatar": "/uploads/profile_pictures/default.png"
     }
 
+@app.get("/settings/profile")
+def get_profile():
+    settings = load_settings()
+    return settings if settings else {
+        "name": "Hania",
+        "role": "Admin",
+        "email": "hania@example.com",
+        "username": "hania",
+        "avatar": "/uploads/profile_pictures/default.png"
+    }
+
 @app.put("/settings/profile")
 def update_profile(profile: dict):
-    try:
-        with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
-            json.dump(profile, file, indent=4)
-    except Exception:
-        try:
-            with open("/tmp/settings.json", "w", encoding="utf-8") as file:
-                json.dump(profile, file, indent=4)
-        except Exception:
-            pass
-    return {
-        "message": "Profile updated",
-        "profile": profile
-    }
+    settings = load_settings()
+    settings.update(profile)
+    save_settings(settings)
     return {
         "message": "Profile updated successfully",
-        "profile": profile
+        "profile": settings
     }
     
 @app.post("/settings/profile-picture")
 async def upload_profile_picture(file: UploadFile = File(...)):
-    upload_folder = os.path.join(BASE_DIR, "profile_pictures")
-    os.makedirs(upload_folder, exist_ok=True)
-    print("BASE_DIR:", BASE_DIR)
-    print("UPLOAD FOLDER:", upload_folder)
-    print("FILES:", os.listdir(upload_folder))
-    file_path = os.path.join(upload_folder, file.filename)
+    content = await file.read()
+    filename = file.filename
     
-    with open(file_path, "wb") as buffer:
-        content = await file.read()
-        buffer.write(content)
+    upload_folder = os.path.join(BASE_DIR, "profile_pictures")
+    file_path = os.path.join(upload_folder, filename)
+    try:
+        os.makedirs(upload_folder, exist_ok=True)
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+    except Exception as err:
+        print("Could not save to BASE_DIR/profile_pictures:", err)
+        try:
+            tmp_folder = "/tmp/profile_pictures"
+            os.makedirs(tmp_folder, exist_ok=True)
+            with open(os.path.join(tmp_folder, filename), "wb") as buffer:
+                buffer.write(content)
+        except Exception as tmp_err:
+            print("Could not save to /tmp/profile_pictures:", tmp_err)
 
-    # Load existing settings
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
-    # Save profile picture filename
-    settings["profile_picture"] = file.filename
-
-    # Update settings.json
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
+    settings = load_settings()
+    settings["profile_picture"] = filename
+    save_settings(settings)
 
     return {
         "message": "Profile picture uploaded successfully",
-        "filename": file.filename
+        "filename": filename
     }
-    
+
+@app.get("/profile-pictures/{filename}")
+@app.get("/profile_pictures/{filename}")
+def serve_profile_picture(filename: str):
+    candidates = [
+        os.path.join(BASE_DIR, "profile_pictures", filename),
+        os.path.join("/tmp/profile_pictures", filename)
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            return FileResponse(path)
+    default_path = os.path.join(BASE_DIR, "profile_pictures", "Jolly.jpeg")
+    if os.path.exists(default_path):
+        return FileResponse(default_path)
+    raise HTTPException(status_code=404, detail="Picture not found")
+
 @app.put("/settings/notifications/email")
 def update_email_notification(data: dict):
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "notifications" not in settings:
         settings["notifications"] = {}
-
-    settings["notifications"]["email"] = data["enabled"]
-
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
+    settings["notifications"]["email"] = data.get("enabled", False)
+    save_settings(settings)
     return {
         "message": "Email notification updated successfully",
         "enabled": settings["notifications"]["email"]
@@ -209,17 +221,11 @@ def update_email_notification(data: dict):
 
 @app.put("/settings/notifications/security")
 def update_security_notification(data: dict):
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "notifications" not in settings:
         settings["notifications"] = {}
-
-    settings["notifications"]["security"] = data["enabled"]
-
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
-
+    settings["notifications"]["security"] = data.get("enabled", False)
+    save_settings(settings)
     return {
         "message": "Security notification updated successfully",
         "enabled": settings["notifications"]["security"]
@@ -227,16 +233,11 @@ def update_security_notification(data: dict):
     
 @app.put("/settings/notifications/reports")
 def update_reports_notification(data: dict):
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "notifications" not in settings:
         settings["notifications"] = {}
-
-    settings["notifications"]["reports"] = data["enabled"]
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
-
+    settings["notifications"]["reports"] = data.get("enabled", False)
+    save_settings(settings)
     return {
         "message": "Weekly reports notification updated successfully",
         "enabled": settings["notifications"]["reports"]
@@ -244,17 +245,11 @@ def update_reports_notification(data: dict):
     
 @app.put("/settings/notifications/updates")
 def update_updates_notification(data: dict):
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "notifications" not in settings:
         settings["notifications"] = {}
-
-    settings["notifications"]["updates"] = data["enabled"]
-
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
-
+    settings["notifications"]["updates"] = data.get("enabled", False)
+    save_settings(settings)
     return {
         "message": "Product updates notification updated successfully",
         "enabled": settings["notifications"]["updates"]
@@ -279,18 +274,11 @@ def get_notifications():
     
 @app.put("/settings/appearance/theme")
 def update_theme(data: dict):
-
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "appearance" not in settings:
         settings["appearance"] = {}
-
-    settings["appearance"]["theme"] = data["theme"]
-
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
-
+    settings["appearance"]["theme"] = data.get("theme", "dark")
+    save_settings(settings)
     return {
         "message": "Theme updated successfully",
         "theme": settings["appearance"]["theme"]
@@ -298,18 +286,11 @@ def update_theme(data: dict):
     
 @app.put("/settings/appearance/primary-color")
 def update_primary_color(data: dict):
-
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "appearance" not in settings:
         settings["appearance"] = {}
-
-    settings["appearance"]["primary_color"] = data["primary_color"]
-
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
-
+    settings["appearance"]["primary_color"] = data.get("primary_color", "blue")
+    save_settings(settings)
     return {
         "message": "Primary color updated successfully",
         "primary_color": settings["appearance"]["primary_color"]
@@ -317,32 +298,24 @@ def update_primary_color(data: dict):
     
 @app.get("/settings/security")
 def get_security_settings():
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
+    settings = load_settings()
     security = settings.get("security", {})
-
     return {
         "two_factor_enabled": security.get("two_factor_enabled", False),
-        "active_sessions": security.get("active_sessions", 0),
+        "active_sessions": security.get("active_sessions", []),
         "login_history": security.get("login_history", [])
     }
  
 class TwoFactorRequest(BaseModel):
     enabled: bool   
+
 @app.put("/settings/security/2fa")
 def update_two_factor(data: TwoFactorRequest):
-
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     if "security" not in settings:
         settings["security"] = {}
-
     settings["security"]["two_factor_enabled"] = data.enabled
-
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-        json.dump(settings, settings_file, indent=4)
-
+    save_settings(settings)
     return {
         "message": "Two-factor authentication updated successfully",
         "two_factor_enabled": settings["security"]["two_factor_enabled"]
@@ -350,60 +323,43 @@ def update_two_factor(data: TwoFactorRequest):
     
 @app.get("/settings/security/sessions")
 def get_active_sessions():
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     security = settings.get("security", {})
     sessions = security.get("active_sessions", [])
     return {
-        "active_sessions": len(sessions)
+        "active_sessions": len(sessions) if isinstance(sessions, list) else 1
     }
     
 @app.get("/settings/security/sessions/list")
 def get_session_list():
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     security = settings.get("security", {})
     sessions = security.get("active_sessions", [])
     return {
-        "sessions": sessions
+        "sessions": sessions if isinstance(sessions, list) else []
     }
     
 @app.delete("/settings/security/sessions/{session_id}")
 def revoke_session(session_id: str):
-
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
-
+    settings = load_settings()
     security = settings.get("security", {})
-
     sessions = security.get("active_sessions", [])
-
-    for session in sessions:
-
-        if session.get("id") == session_id:
-
-            # Don't allow current session to be revoked
-            if session.get("current") is True:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Current session cannot be revoked"
-                )
-
-            sessions.remove(session)
-
-            security["active_sessions"] = sessions
-            settings["security"] = security
-
-            with open(SETTINGS_FILE, "w", encoding="utf-8") as settings_file:
-                json.dump(settings, settings_file, indent=4)
-
-            return {
-                "message": "Session revoked successfully",
-                "session_id": session_id
-            }
-
+    if isinstance(sessions, list):
+        for session in sessions:
+            if session.get("id") == session_id:
+                if session.get("current") is True:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Current session cannot be revoked"
+                    )
+                sessions.remove(session)
+                security["active_sessions"] = sessions
+                settings["security"] = security
+                save_settings(settings)
+                return {
+                    "message": "Session revoked successfully",
+                    "session_id": session_id
+                }
     raise HTTPException(
         status_code=404,
         detail="Session not found"
@@ -411,10 +367,8 @@ def revoke_session(session_id: str):
     
 @app.get("/settings/security/login-history")
 def get_login_history():
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as settings_file:
-        settings = json.load(settings_file)
+    settings = load_settings()
     security = settings.get("security", {})
-
     login_history = security.get("login_history", [])
     return {
         "login_history": login_history

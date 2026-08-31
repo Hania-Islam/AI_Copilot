@@ -44,6 +44,10 @@
       "dest": "api/index.py"
     },
     {
+      "src": "/profile-pictures/(.*)",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }
