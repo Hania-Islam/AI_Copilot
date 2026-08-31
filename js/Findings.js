@@ -7,6 +7,47 @@ let currentPage = 1;
 const findingsPerPage = 8;
 let filteredFindings = [];
 let selectedFinding = null;
+function sanitizeFindingItem(f, idx) {
+    if (!f) return f;
+    
+    // Clean Title
+    let rawTitle = (f.title || `Finding ${idx || 1}`).trim();
+    rawTitle = rawTitle.split('\n')[0].trim();
+    rawTitle = rawTitle.replace(/^(?:FINDING|Finding|Vulnerability|Issue|\d+[\.\:]\s*)\s*(?:#?\s*(?:[0-9]+|FND-[0-9]+)\s*[:\-]?\s*)?/i, '').trim();
+    if (/^(?:SECURITY ASSESSMENT REPORT|Executive Summary|Finding Summary)\b/i.test(rawTitle)) {
+        let subTitle = rawTitle.replace(/^(?:SECURITY ASSESSMENT REPORT|Executive Summary|Finding Summary)\s*[:\-]?\s*/i, '').trim();
+        rawTitle = (subTitle && subTitle.length > 3) ? subTitle : "Security Assessment Finding";
+    }
+    if (rawTitle.length > 60) {
+        rawTitle = rawTitle.slice(0, 57) + "...";
+    }
+    f.title = rawTitle;
+
+    // Clean Endpoint / Asset
+    let rawEndpoint = (f.endpoint || "/").trim();
+    rawEndpoint = rawEndpoint.split('\n')[0].trim();
+    rawEndpoint = rawEndpoint.split(/\s*(?:Description|Impact|Remediation|Vulnerable|Secure)\b/i)[0].trim();
+    const epMatch = rawEndpoint.match(/(?:GET|POST|PUT|DELETE|PATCH)?\s*(\/[\w\-\.\{\}\*\:\?\/]*)/i);
+    if (epMatch && epMatch[0]) {
+        rawEndpoint = epMatch[0].trim();
+    }
+    if (rawEndpoint.length > 35) {
+        rawEndpoint = rawEndpoint.slice(0, 32) + "...";
+    }
+    f.endpoint = rawEndpoint || "/";
+
+    // Clean ID
+    let rawId = String(f.id || idx || 1).trim();
+    rawId = rawId.replace(/^FND-/i, '').trim();
+    if (rawId.length > 12) {
+        const numMatch = rawId.match(/\d+/);
+        rawId = numMatch ? numMatch[0] : rawId.slice(0, 8);
+    }
+    f.id = rawId;
+
+    return f;
+}
+
 async function loadFindings() {
     let findingsList = [];
     try {
@@ -27,30 +68,47 @@ async function loadFindings() {
         localUploads.forEach(lu => {
             if (Array.isArray(lu.findings)) {
                 lu.findings.forEach(lf => {
-                    const exists = findingsList.some(bf => String(bf.id) === String(lf.id) && bf.filename === lf.filename);
-                    if (!exists) {
-                        findingsList.unshift(lf);
-                    }
+                    findingsList.push(lf);
                 });
             }
         });
     } catch (e) {}
 
     // Clean & standardize fields for all findings
-    findingsList.forEach(f => {
-        const rawDate = f.date_detected || f.date || (f.upload_time ? f.upload_time.split(" ")[0] : "");
-        f.date_detected = (rawDate && typeof rawDate === "string" && rawDate.trim() !== "" && rawDate.toLowerCase() !== "undefined" && rawDate.toLowerCase() !== "null" && rawDate.toLowerCase() !== "none") ? rawDate.trim().split(" ")[0] : new Date().toISOString().split("T")[0];
-        if (!f.type) f.type = "Other";
-        if (!f.cvss) {
-            if (f.severity === "Critical") f.cvss = 9.8;
-            else if (f.severity === "High") f.cvss = 8.5;
-            else if (f.severity === "Medium") f.cvss = 6.5;
-            else if (f.severity === "Low") f.cvss = 3.1;
-            else f.cvss = 0.0;
+    const cleanedList = [];
+    const uniqueKeys = new Set();
+
+    findingsList.forEach((f, index) => {
+        const cleaned = sanitizeFindingItem({ ...f }, index + 1);
+        const rawDate = cleaned.date_detected || cleaned.date || (cleaned.upload_time ? cleaned.upload_time.split(" ")[0] : "");
+        cleaned.date_detected = (rawDate && typeof rawDate === "string" && rawDate.trim() !== "" && rawDate.toLowerCase() !== "undefined" && rawDate.toLowerCase() !== "null" && rawDate.toLowerCase() !== "none") ? rawDate.trim().split(" ")[0] : new Date().toISOString().split("T")[0];
+        if (!cleaned.type) cleaned.type = "Other";
+        if (!cleaned.cvss) {
+            if (cleaned.severity === "Critical") cleaned.cvss = 9.8;
+            else if (cleaned.severity === "High") cleaned.cvss = 8.5;
+            else if (cleaned.severity === "Medium") cleaned.cvss = 6.5;
+            else if (cleaned.severity === "Low") cleaned.cvss = 3.1;
+            else cleaned.cvss = 0.0;
+        }
+
+        // Deduplicate using title + endpoint key
+        const key = `${cleaned.title.toLowerCase().trim()}_${cleaned.endpoint.toLowerCase().trim()}`;
+        if (!uniqueKeys.has(key)) {
+            uniqueKeys.add(key);
+            cleanedList.push(cleaned);
         }
     });
 
-    allFindings = findingsList;
+    // Deterministic sorting: Critical -> High -> Medium -> Low, then by date, then by title
+    const severityMap = { "Critical": 1, "High": 2, "Medium": 3, "Low": 4 };
+    cleanedList.sort((a, b) => {
+        const sevA = severityMap[a.severity] || 5;
+        const sevB = severityMap[b.severity] || 5;
+        if (sevA !== sevB) return sevA - sevB;
+        return (b.date_detected || "").localeCompare(a.date_detected || "") || a.title.localeCompare(b.title);
+    });
+
+    allFindings = cleanedList;
     filteredFindings = allFindings;
     currentPage = 1;
     displayPage(allFindings);

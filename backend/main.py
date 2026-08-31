@@ -582,7 +582,17 @@ def create_finding_object(id_val, title, severity, endpoint, description, eviden
         elif severity_clean == "Medium": cvss_val = 6.5
         elif severity_clean == "Low": cvss_val = 3.1
 
-    title_clean = title.strip() if title else f"Finding {idx}"
+    # Clean Title
+    raw_title = (title or "").strip()
+    raw_title = raw_title.split('\n')[0].strip()
+    raw_title = re.sub(r'^(?:FINDING|Finding|Vulnerability|Issue|\d+[\.\:]\s*)\s*(?:#?\s*(?:[0-9]+|FND-[0-9]+)\s*[:\-]?\s*)?', '', raw_title).strip()
+    if re.match(r'(?i)^(?:SECURITY ASSESSMENT REPORT|Executive Summary|Finding Summary)\b', raw_title):
+        sub_title = re.sub(r'(?i)^(?:SECURITY ASSESSMENT REPORT|Executive Summary|Finding Summary)\s*[:\-]?\s*', '', raw_title).strip()
+        raw_title = sub_title if sub_title and len(sub_title) > 3 else "Security Assessment Finding"
+    if len(raw_title) > 60:
+        raw_title = raw_title[:57] + "..."
+    title_clean = raw_title if raw_title else f"Finding {idx}"
+
     title_lower = title_clean.lower()
     if "xss" in title_lower or "cross-site script" in title_lower:
         finding_type = "XSS"
@@ -616,7 +626,23 @@ def create_finding_object(id_val, title, severity, endpoint, description, eviden
     if status_clean not in ["Open", "Resolved", "Fixed", "In Progress"]:
         status_clean = "Open"
 
-    id_clean = str(id_val).strip() if id_val else f"{idx:03d}"
+    id_str = str(id_val).strip() if id_val else f"{idx:03d}"
+    id_clean = id_str.replace("FND-", "").strip()
+    if len(id_clean) > 15:
+        num_m = re.search(r'\d+', id_clean)
+        id_clean = num_m.group(0) if num_m else id_clean[:10]
+
+    raw_endpoint = (endpoint or "/").strip().split('\n')[0].strip()
+    raw_endpoint = re.split(r'\s*(?:Description|Impact|Remediation|Vulnerable|Secure)\b', raw_endpoint, flags=re.I)[0].strip()
+    ep_match = re.search(r'(?:GET|POST|PUT|DELETE|PATCH)?\s*([/\w\-\.\{\}\*\:\?\/]+)', raw_endpoint)
+    if ep_match and ep_match.group(1).startswith('/'):
+        endpoint_clean = ep_match.group(0).strip()
+    else:
+        endpoint_clean = raw_endpoint
+    if len(endpoint_clean) > 40:
+        endpoint_clean = endpoint_clean[:37] + "..."
+    if not endpoint_clean:
+        endpoint_clean = "/"
 
     return {
         "id": id_clean,
@@ -624,8 +650,8 @@ def create_finding_object(id_val, title, severity, endpoint, description, eviden
         "filename": filename or "",
         "title": title_clean,
         "severity": severity_clean,
-        "endpoint": (endpoint or "/").strip(),
-        "description": (description or f"Vulnerability detected in {endpoint or 'the application'}.").strip(),
+        "endpoint": endpoint_clean,
+        "description": (description or f"Vulnerability detected in {endpoint_clean}.").strip(),
         "evidence": (evidence or "Detailed evidence captured during report analysis.").strip(),
         "recommendation": (recommendation or "Apply recommended security patches and validate input.").strip(),
         "cvss": cvss_val,
