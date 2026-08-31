@@ -853,16 +853,30 @@ function updatePagination(findings) {
     }
     const start = (currentPage - 1) * findingsPerPage + 1;
     const end = Math.min(currentPage * findingsPerPage, findings.length);
-    paginationInfo.textContent =`Showing ${start} to ${end} of ${findings.length} findings`;
-    for (let page = 1; page <= totalPages; page++) {
+    paginationInfo.textContent = `Showing ${start} to ${end} of ${findings.length} findings`;
+
+    // Compact windowed pagination (max 5 buttons visible)
+    let pagesToDisplay = [];
+    if (totalPages <= 5) {
+        for (let i = 1; i <= totalPages; i++) pagesToDisplay.push(i);
+    } else {
+        if (currentPage <= 3) {
+            pagesToDisplay = [1, 2, 3, 4, 5];
+        } else if (currentPage >= totalPages - 2) {
+            pagesToDisplay = [totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+        } else {
+            pagesToDisplay = [currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2];
+        }
+    }
+
+    pagesToDisplay.forEach(page => {
         const button = document.createElement("button");
         button.textContent = page;
-        button.className ="w-8 h-8 rounded-lg text-xs";
+        button.className = "w-8 h-8 rounded-lg text-xs shrink-0 flex items-center justify-center font-medium transition";
         if (page === currentPage) {
-            button.classList.add("bg-blue-600","text-white"
-            );
+            button.classList.add("bg-blue-600", "text-white");
         } else {
-            button.classList.add( "border", "border-slate-300", "dark:border-slate-700", "text-slate-500", "dark:text-slate-400", "hover:bg-slate-100", "dark:hover:bg-slate-800");
+            button.classList.add("border", "border-slate-300", "dark:border-slate-700", "text-slate-500", "dark:text-slate-400", "hover:bg-slate-100", "dark:hover:bg-slate-800");
         }
 
         button.addEventListener("click", () => {
@@ -871,7 +885,7 @@ function updatePagination(findings) {
             updatePagination(filteredFindings);
         });
         paginationNumbers.appendChild(button);
-    }
+    });
 }
 
 const prevPage = document.getElementById("prevPage");
