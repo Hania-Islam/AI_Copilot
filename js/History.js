@@ -32,25 +32,32 @@ let filteredUploads = [];
 let currentStatusFilter = "All Status";
 let currentTypeFilter = "All Types";
 let currentSearch = "";
-document.addEventListener("DOMContentLoaded", () => {
-    applySavedTheme()
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+        if (typeof applySavedTheme === "function") applySavedTheme();
+        loadHistory();
+    });
+} else {
+    if (typeof applySavedTheme === "function") applySavedTheme();
     loadHistory();
-    // time
-});
+}
+
 const severityBtn = document.getElementById("severityBtn");
 const severityDropdown = document.getElementById("severityDropdown");
 const severityText = document.getElementById("severityText");
 
-severityBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    severityDropdown.classList.toggle("hidden");
-});
+if (severityBtn && severityDropdown) {
+    severityBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        severityDropdown.classList.toggle("hidden");
+    });
+}
 
 document.querySelectorAll(".severityOption").forEach(option => {
     option.addEventListener("click", () => {
         currentTimeFilter = option.textContent.trim();
-        severityText.textContent = currentTimeFilter;
-        severityDropdown.classList.add("hidden");
+        if (severityText) severityText.textContent = currentTimeFilter;
+        if (severityDropdown) severityDropdown.classList.add("hidden");
         applyFilters();
     });
 });
@@ -710,51 +717,56 @@ function applyFilters() {
 
 // SEARCH/filter by name
 const filterInput = document.getElementById("filterInput");
-filterInput.addEventListener("input", () => {
-    currentSearch = filterInput.value.toLowerCase().trim();
-    applyFilters();
-});
-
+if (filterInput) {
+    filterInput.addEventListener("input", () => {
+        currentSearch = filterInput.value.toLowerCase().trim();
+        applyFilters();
+    });
+}
 
 const statusBtn = document.getElementById("statusBtn");
 const statusDropdown = document.getElementById("statusDropdown");
 const statusText = document.getElementById("statusText");
-statusBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    statusDropdown.classList.toggle("hidden");
-});
+if (statusBtn && statusDropdown) {
+    statusBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        statusDropdown.classList.toggle("hidden");
+    });
+}
 
 document.querySelectorAll(".statusOption").forEach(option => {
     option.addEventListener("click", () => {
         currentStatusFilter = option.textContent.trim();
-        statusText.textContent = currentStatusFilter;
-        statusDropdown.classList.add("hidden");
+        if (statusText) statusText.textContent = currentStatusFilter;
+        if (statusDropdown) statusDropdown.classList.add("hidden");
         applyFilters();
     });
-
 });
 
-     // TYPES
-     const typesBtn = document.getElementById("typesBtn");
-     const typesDropdown = document.getElementById("typesDropdown");
-     const typesText = document.getElementById("typesText");
- 
-     typesBtn.addEventListener("click", (e) => {
-         e.stopPropagation();
-         typesDropdown.classList.toggle("hidden");
-     });
- 
-     document.querySelectorAll(".typesOption").forEach(option => {
-        option.addEventListener("click", () => {
-            currentTypeFilter = option.textContent.trim();
-            typesText.textContent = currentTypeFilter;
-            typesDropdown.classList.add("hidden");
-            applyFilters();
-        });
-    });
+// TYPES
+const typesBtn = document.getElementById("typesBtn");
+const typesDropdown = document.getElementById("typesDropdown");
+const typesText = document.getElementById("typesText");
 
-    //  Export button
-     const exportBtn = document.getElementById("exportBtn");
+if (typesBtn && typesDropdown) {
+    typesBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        typesDropdown.classList.toggle("hidden");
+    });
+}
+
+document.querySelectorAll(".typesOption").forEach(option => {
+    option.addEventListener("click", () => {
+        currentTypeFilter = option.textContent.trim();
+        if (typesText) typesText.textContent = currentTypeFilter;
+        if (typesDropdown) typesDropdown.classList.add("hidden");
+        applyFilters();
+    });
+});
+
+// Export button
+const exportBtn = document.getElementById("exportBtn");
+if (exportBtn) {
     exportBtn.addEventListener("click", () => {
         // Give all table rows that are currently visible
     const rows = document.querySelectorAll("tbody tr:not(.hidden)");
@@ -792,9 +804,11 @@ document.querySelectorAll(".statusOption").forEach(option => {
 
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-});
-
-    document.addEventListener("click", () => {
-        statusDropdown.classList.add("hidden");
-        typesDropdown.classList.add("hidden");
     });
+}
+
+document.addEventListener("click", () => {
+    if (typeof statusDropdown !== "undefined" && statusDropdown) statusDropdown.classList.add("hidden");
+    if (typeof typesDropdown !== "undefined" && typesDropdown) typesDropdown.classList.add("hidden");
+    if (typeof severityDropdown !== "undefined" && severityDropdown) severityDropdown.classList.add("hidden");
+});
