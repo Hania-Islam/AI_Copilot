@@ -23,6 +23,20 @@ async function initAIRemediation() {
         }
     } catch (err) {}
 
+    try {
+        const localUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+        localUploads.forEach(lu => {
+            if (Array.isArray(lu.findings)) {
+                lu.findings.forEach(lf => {
+                    const exists = findings.some(bf => String(bf.id) === String(lf.id) && bf.filename === lf.filename);
+                    if (!exists) {
+                        findings.unshift(lf);
+                    }
+                });
+            }
+        });
+    } catch (e) {}
+
     if (paramId || paramFile) {
         let matched = null;
         if (paramId && paramFile) {
@@ -284,77 +298,88 @@ async function initAIRemediation() {
         statusDot.classList.add("bg-red-500");
     }
 
-    const similarFindingsContainer =document.getElementById("similarFindingsContainer");
-    console.log("SIMILAR FINDINGS CONTAINER:", similarFindingsContainer);
-    try {
-        const apiUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        console.log("FINDINGS RESPONSE:", data);
-        const allFindings = data.findings;
-        const similarFindings = allFindings.filter(
-            finding =>
-                finding.filename === selectedFinding.filename &&
-                finding.id !== selectedFinding.id
-        );
-        const uniqueSimilarFindings = [
-            ...new Map(
-                similarFindings.map(finding => [finding.id, finding])
-            ).values()
-        ];
-        
-        console.log("UNIQUE SIMILAR FINDINGS:", uniqueSimilarFindings);
+    const similarFindingsContainer = document.getElementById("similarFindingsContainer");
+    if (similarFindingsContainer) {
         similarFindingsContainer.innerHTML = "";
+        
+        let allList = [...findings];
+        try {
+            const localUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+            localUploads.forEach(lu => {
+                if (Array.isArray(lu.findings)) {
+                    lu.findings.forEach(lf => {
+                        const exists = allList.some(bf => String(bf.id) === String(lf.id));
+                        if (!exists) allList.push(lf);
+                    });
+                }
+            });
+        } catch (e) {}
 
-        uniqueSimilarFindings.forEach(finding => {
-            const row = document.createElement("div");
-            row.className =
-                "flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 dark:border-slate-700/50";
+        // 1. Exact filename match
+        let similar = allList.filter(f => 
+            String(f.id) !== String(selectedFinding.id) &&
+            f.filename && selectedFinding.filename &&
+            f.filename === selectedFinding.filename
+        );
 
-            row.innerHTML = `
-                <div class="flex items-center gap-2 min-w-0">
+        // 2. Fallback to same severity or type
+        if (similar.length < 2) {
+            const extra = allList.filter(f =>
+                String(f.id) !== String(selectedFinding.id) &&
+                !similar.some(sf => String(sf.id) === String(f.id)) &&
+                (f.severity === selectedFinding.severity || f.type === selectedFinding.type)
+            );
+            similar = [...similar, ...extra];
+        }
 
-                    <i data-lucide="globe-2"
-                    class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0">
-                    </i>
+        // 3. Fallback to any remaining findings
+        if (similar.length < 2) {
+            const remaining = allList.filter(f =>
+                String(f.id) !== String(selectedFinding.id) &&
+                !similar.some(sf => String(sf.id) === String(f.id))
+            );
+            similar = [...similar, ...remaining];
+        }
 
-                    <span class="text-xs text-slate-600 dark:text-slate-400 truncate">
-                        ${finding.title} in ${finding.endpoint}
+        const uniqueSimilar = [...new Map(similar.map(f => [String(f.id), f])).values()].slice(0, 5);
+
+        if (uniqueSimilar.length === 0) {
+            similarFindingsContainer.innerHTML = `<p class="px-4 py-3 text-xs text-slate-500 text-center">No other findings in this report</p>`;
+        } else {
+            uniqueSimilar.forEach(finding => {
+                const row = document.createElement("div");
+                row.className = "flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 dark:border-slate-700/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50 transition";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2 min-w-0">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-blue-500 shrink-0"></i>
+                        <span class="text-xs text-slate-700 dark:text-slate-300 font-medium truncate">
+                            ${finding.title} <span class="text-slate-400">in ${finding.endpoint || 'system'}</span>
+                        </span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold shrink-0
+                        ${
+                            finding.severity === "Critical"
+                                ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                                : finding.severity === "High"
+                                ? "bg-orange-500/10 text-orange-500 border border-orange-500/20"
+                                : finding.severity === "Medium"
+                                ? "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
+                                : "bg-green-500/10 text-green-500 border border-green-500/20"
+                        }">
+                        ${finding.severity}
                     </span>
-
-                </div>
-
-                <span class="px-2 py-1 rounded-md text-xs shrink-0
-                    ${
-                        finding.severity === "Critical"
-                            ? "bg-red-100 dark:bg-red-500/10 text-red-500 dark:text-red-400"
-                            : finding.severity === "High"
-                            ? "bg-orange-100 dark:bg-orange-500/10 text-orange-500 dark:text-orange-400"
-                            : finding.severity === "Medium"
-                            ? "bg-yellow-100 dark:bg-yellow-500/10 text-yellow-500 dark:text-yellow-400"
-                            : "bg-blue-100 dark:bg-blue-500/10 text-blue-500 dark:text-blue-400"
-                    }">
-                    ${finding.severity}
-                </span>
-            `;
-            similarFindingsContainer.appendChild(row);
-        });
-
-        lucide.createIcons();
-                console.log("SIMILAR FINDINGS:", similarFindings);
-                console.table(
-                    similarFindings.map(finding => ({
-                        id: finding.id,
-                        title: finding.title,
-                        severity: finding.severity,
-                        endpoint: finding.endpoint,
-                        filename: finding.filename
-                    }))
-                );
-            } catch (error) {
-                console.error("FINDINGS FETCH ERROR:", error);
-
-            }
+                `;
+                row.addEventListener("click", () => {
+                    localStorage.setItem("selectedFinding", JSON.stringify(finding));
+                    const paramId = encodeURIComponent(finding.id || "");
+                    const paramFile = encodeURIComponent(finding.filename || "");
+                    window.location.href = `AI_Remediation.html?id=${paramId}&filename=${paramFile}`;
+                });
+                similarFindingsContainer.appendChild(row);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+    }
 document.getElementById("learnMoreText").textContent = `Learn more about ${selectedFinding.title} and recommended security practices.`;
 const whyThisWorks = document.getElementById("whyThisWorks");
 
