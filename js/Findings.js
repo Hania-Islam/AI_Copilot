@@ -68,7 +68,10 @@ async function loadFindings() {
         localUploads.forEach(lu => {
             if (Array.isArray(lu.findings)) {
                 lu.findings.forEach(lf => {
-                    findingsList.push(lf);
+                    const findingWithMeta = { ...lf };
+                    if (!findingWithMeta.filename) findingWithMeta.filename = lu.filename || "";
+                    if (!findingWithMeta.upload_time) findingWithMeta.upload_time = lu.upload_time || "";
+                    findingsList.push(findingWithMeta);
                 });
             }
         });
@@ -98,8 +101,9 @@ async function loadFindings() {
             else cleaned.cvss = 0.0;
         }
 
-        // Deduplicate using title + endpoint key
-        const key = `${cleaned.title.toLowerCase().trim()}_${cleaned.endpoint.toLowerCase().trim()}`;
+        // Deduplicate using filename + id + title key (preserving new findings per file upload)
+        const fn = (cleaned.filename || f.filename || '').toLowerCase().trim();
+        const key = `${fn}_${cleaned.id || index}_${cleaned.title.toLowerCase().trim()}`;
         if (!uniqueKeys.has(key)) {
             uniqueKeys.add(key);
             cleanedList.push(cleaned);

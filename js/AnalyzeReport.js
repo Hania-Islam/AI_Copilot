@@ -313,8 +313,13 @@ async function uploadFileToServer(file) {
             const errData = await response.json().catch(() => ({}));
             throw new Error(errData.detail || "Upload failed with status " + response.status);
         }
-        const data = await response.json();
+        let data = await response.json();
         console.log("Upload successful:", data);
+
+        if (!data || !Array.isArray(data.findings) || data.findings.length === 0) {
+            const clientParsed = await parseFileClientSide(file);
+            data = { ...clientParsed, ...data, findings: clientParsed.findings, findings_count: clientParsed.findings.length };
+        }
 
         // Save upload to local storage cache immediately for cross-instance persistence
         try {
@@ -327,10 +332,21 @@ async function uploadFileToServer(file) {
         }
 
         await loadRecentUploads();
+        fileError.classList.add("hidden");
     } catch (error) {
-        console.error("Backend upload failed:", error);
-        fileError.innerText = `Upload failed: ${error.message || "Could not connect to backend server."}`;
-        fileError.classList.remove("hidden");
+        console.warn("Backend upload error, executing client-side extraction:", error);
+        try {
+            const clientParsed = await parseFileClientSide(file);
+            let userUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+            userUploads = userUploads.filter(u => u.filename !== clientParsed.filename || u.upload_time !== clientParsed.upload_time);
+            userUploads.unshift(clientParsed);
+            localStorage.setItem("local_user_uploads", JSON.stringify(userUploads.slice(0, 30)));
+            await loadRecentUploads();
+            fileError.classList.add("hidden");
+        } catch (e) {
+            fileError.innerText = `Upload failed: ${error.message || "Could not connect to backend server."}`;
+            fileError.classList.remove("hidden");
+        }
     }
 }
 
