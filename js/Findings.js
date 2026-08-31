@@ -18,28 +18,28 @@ function sanitizeFindingItem(f, idx) {
         let subTitle = rawTitle.replace(/^(?:SECURITY ASSESSMENT REPORT|Executive Summary|Finding Summary)\s*[:\-]?\s*/i, '').trim();
         rawTitle = (subTitle && subTitle.length > 3) ? subTitle : "Security Assessment Finding";
     }
-    if (rawTitle.length > 60) {
-        rawTitle = rawTitle.slice(0, 57) + "...";
+    if (rawTitle.length > 55) {
+        rawTitle = rawTitle.slice(0, 52) + "...";
     }
     f.title = rawTitle;
 
     // Clean Endpoint / Asset
     let rawEndpoint = (f.endpoint || "/").trim();
     rawEndpoint = rawEndpoint.split('\n')[0].trim();
-    rawEndpoint = rawEndpoint.split(/\s*(?:Description|Impact|Remediation|Vulnerable|Secure)\b/i)[0].trim();
-    const epMatch = rawEndpoint.match(/(?:GET|POST|PUT|DELETE|PATCH)?\s*(\/[\w\-\.\{\}\*\:\?\/]*)/i);
-    if (epMatch && epMatch[0]) {
-        rawEndpoint = epMatch[0].trim();
+    rawEndpoint = rawEndpoint.split(/\s*(?:Description|Impact|Remediation|Vulnerable|Secure|Executive|Synthetic)\b/i)[0].trim();
+    const epMatch = rawEndpoint.match(/(?:GET|POST|PUT|DELETE|PATCH)?\s*(\/[^\s\?\:\;]*)/i);
+    if (epMatch && (epMatch[0] || epMatch[1])) {
+        rawEndpoint = (epMatch[0] || epMatch[1]).trim();
     }
-    if (rawEndpoint.length > 35) {
-        rawEndpoint = rawEndpoint.slice(0, 32) + "...";
+    if (rawEndpoint.length > 30) {
+        rawEndpoint = rawEndpoint.slice(0, 27) + "...";
     }
     f.endpoint = rawEndpoint || "/";
 
     // Clean ID
     let rawId = String(f.id || idx || 1).trim();
     rawId = rawId.replace(/^FND-/i, '').trim();
-    if (rawId.length > 12) {
+    if (rawId.length > 10) {
         const numMatch = rawId.match(/\d+/);
         rawId = numMatch ? numMatch[0] : rawId.slice(0, 8);
     }
@@ -80,6 +80,13 @@ async function loadFindings() {
 
     findingsList.forEach((f, index) => {
         const cleaned = sanitizeFindingItem({ ...f }, index + 1);
+        
+        // Filter out raw non-vulnerability report headers
+        const tLower = cleaned.title.toLowerCase().trim();
+        if (tLower === "security assessment report" || tLower === "executive summary" || tLower === "finding summary" || tLower === "security assessment finding") {
+            return;
+        }
+
         const rawDate = cleaned.date_detected || cleaned.date || (cleaned.upload_time ? cleaned.upload_time.split(" ")[0] : "");
         cleaned.date_detected = (rawDate && typeof rawDate === "string" && rawDate.trim() !== "" && rawDate.toLowerCase() !== "undefined" && rawDate.toLowerCase() !== "null" && rawDate.toLowerCase() !== "none") ? rawDate.trim().split(" ")[0] : new Date().toISOString().split("T")[0];
         if (!cleaned.type) cleaned.type = "Other";
