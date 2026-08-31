@@ -315,6 +315,17 @@ async function uploadFileToServer(file) {
         }
         const data = await response.json();
         console.log("Upload successful:", data);
+
+        // Save upload to local storage cache immediately for cross-instance persistence
+        try {
+            let userUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+            userUploads = userUploads.filter(u => (u.report_id && u.report_id !== data.report_id) && (u.filename !== data.filename || u.upload_time !== data.upload_time));
+            userUploads.unshift(data);
+            localStorage.setItem("local_user_uploads", JSON.stringify(userUploads.slice(0, 30)));
+        } catch (e) {
+            console.warn("Could not write upload to localStorage:", e);
+        }
+
         await loadRecentUploads();
     } catch (error) {
         console.error("Backend upload failed:", error);
@@ -392,28 +403,49 @@ if (documentationBtn) {
 
 // Load recent uploads directly from backend API
 async function loadRecentUploads() {
-    const recentUploads = document.getElementById("recentUploads");
-    if (!recentUploads) return;
-
-    let backendUploads = [];
     try {
         const historyUrl = window.getApiUrl ? window.getApiUrl('/upload-history') : '/upload-history';
         const response = await fetch(historyUrl);
-        if (response.ok) {
-            const data = await response.json();
-            if (data && Array.isArray(data.uploads)) {
-                backendUploads = data.uploads;
-            }
+        if (!response.ok) {
+            console.warn("Failed to fetch upload history from backend:", response.status);
         }
-    } catch (error) {
-        console.warn("Could not fetch upload history from backend:", error);
-    }
+        const data = await response.json().catch(() => ({ uploads: [] }));
+        let uploads = data.uploads || [];
 
-    backendUploads.sort((a, b) => parseDateString(b.upload_time) - parseDateString(a.upload_time));
-    renderRecentUploads(backendUploads);
+        // Bidirectional sync for Vercel cold start persistence
+        try {
+            let localUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+            
+            // Sync backend uploads into local cache
+            uploads.forEach(bu => {
+                const exists = localUploads.some(lu => (bu.report_id && lu.report_id === bu.report_id) || (bu.filename === lu.filename && bu.upload_time === lu.upload_time));
+                if (!exists) {
+                    localUploads.push(bu);
+                }
+            });
+            localStorage.setItem("local_user_uploads", JSON.stringify(localUploads.slice(0, 30)));
+
+            // Inject missing local uploads back into display list
+            localUploads.forEach(lu => {
+                const exists = uploads.some(bu => (bu.report_id && lu.report_id === bu.report_id) || (bu.filename === lu.filename && bu.upload_time === lu.upload_time));
+                if (!exists) {
+                    uploads.unshift(lu);
+                }
+            });
+        } catch (e) {}
+
+        renderRecentUploads(uploads);
+    } catch (error) {
+        console.warn("Error loading recent uploads:", error);
+        try {
+            const localUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+            renderRecentUploads(localUploads);
+        } catch (e) {
+            renderRecentUploads([]);
+        }
+    }
 }
 
 loadRecentUploads();
-document.addEventListener("DOMContentLoaded", loadRecentUploads);
 
 

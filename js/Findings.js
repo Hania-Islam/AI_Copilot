@@ -22,6 +22,20 @@ async function loadFindings() {
         console.warn("Backend findings fetch failed:", error);
     }
 
+    try {
+        const localUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+        localUploads.forEach(lu => {
+            if (Array.isArray(lu.findings)) {
+                lu.findings.forEach(lf => {
+                    const exists = findingsList.some(bf => String(bf.id) === String(lf.id) && bf.filename === lf.filename);
+                    if (!exists) {
+                        findingsList.unshift(lf);
+                    }
+                });
+            }
+        });
+    } catch (e) {}
+
     // Clean & standardize fields for all findings
     findingsList.forEach(f => {
         const rawDate = f.date_detected || f.date || (f.upload_time ? f.upload_time.split(" ")[0] : "");

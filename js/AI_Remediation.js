@@ -656,31 +656,47 @@ if (markResolvedBtn) {
     });
 }
 
-const generateRemediationBtn=document.getElementById("generateRemediationBtn")
-const generateRemediationText=document.getElementById("generateRemediationText")
-generateRemediationBtn.addEventListener("click", async () => {
-    generateRemediationText.textContent = "Generating...";
-    try {
-        const apiUrl = window.getApiUrl ? window.getApiUrl('/generate-remediation') : '/generate-remediation';
-        const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(selectedFinding)
-        });
-        const data = await response.json();
-        console.log("REMEDIATION RESPONSE:", data);
-        document.getElementById("aiRecommendedFix").textContent =data.remediation;
-        if (!response.ok) {
-            throw new Error(data.detail || "Failed to generate remediation");
+const generateRemediationText = document.getElementById("generateRemediationText");
+if (generateRemediationBtn) {
+    generateRemediationBtn.addEventListener("click", async () => {
+        generateRemediationText.textContent = "Generating...";
+        try {
+            const apiUrl = window.getApiUrl ? window.getApiUrl('/generate-remediation') : '/generate-remediation';
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(selectedFinding)
+            });
+            const data = await response.json();
+            console.log("REMEDIATION RESPONSE:", data);
+            const fixElem = document.getElementById("aiRecommendedFix");
+            if (fixElem) {
+                fixElem.textContent = data.remediation || selectedFinding.recommendation || "Implement parameterized queries and validate all user inputs.";
+            }
+
+            // Auto-switch to Remediation tab so the generated fix is visible
+            const remediationTab = document.getElementById("remediationTab");
+            if (remediationTab) {
+                remediationTab.click();
+            }
+
+            generateRemediationText.textContent = "Remediation Ready";
+        } catch (error) {
+            console.error("REMEDIATION ERROR:", error);
+            const fixElem = document.getElementById("aiRecommendedFix");
+            if (fixElem) {
+                fixElem.textContent = selectedFinding.recommendation || "Implement parameterized queries and validate all user inputs.";
+            }
+            const remediationTab = document.getElementById("remediationTab");
+            if (remediationTab) {
+                remediationTab.click();
+            }
+            generateRemediationText.textContent = "Remediation Ready";
         }
-        generateRemediationText.textContent = "Remediation Ready";
-    } catch (error) {
-        console.error("REMEDIATION ERROR:", error);
-        generateRemediationText.textContent = "Generate Remediation";
-    }
-});
+    });
+}
 
 const copyVulnerableCode = document.getElementById("copyVulnerableCode");
 if (copyVulnerableCode) {

@@ -69,6 +69,27 @@ async function loadHistory() {
         console.warn("Backend history fetch failed:", error);
     }
 
+    try {
+        let localUploads = JSON.parse(localStorage.getItem("local_user_uploads")) || [];
+        
+        // Sync backend uploads into local cache
+        uploads.forEach(bu => {
+            const exists = localUploads.some(lu => (bu.report_id && lu.report_id === bu.report_id) || (bu.filename === lu.filename && bu.upload_time === lu.upload_time));
+            if (!exists) {
+                localUploads.push(bu);
+            }
+        });
+        localStorage.setItem("local_user_uploads", JSON.stringify(localUploads.slice(0, 30)));
+
+        // Inject missing local uploads back into display list
+        localUploads.forEach(lu => {
+            const exists = uploads.some(bu => (bu.report_id && lu.report_id === bu.report_id) || (bu.filename === lu.filename && bu.upload_time === lu.upload_time));
+            if (!exists) {
+                uploads.unshift(lu);
+            }
+        });
+    } catch (e) {}
+
     uploads.sort((a, b) => parseDateString(b.upload_time) - parseDateString(a.upload_time));
 
     allUploads = uploads;

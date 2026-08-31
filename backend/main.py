@@ -111,7 +111,25 @@ def load_settings():
                     return json.load(file)
             except Exception as e:
                 print("Error loading settings:", e)
-    return {}
+    return {
+        "api": {
+            "api_key": "sk-" + os.urandom(16).hex(),
+            "integrations": []
+        }
+    }
+
+def save_settings(settings):
+    try:
+        with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
+            json.dump(settings, file, indent=4)
+    except Exception as e:
+        print("Could not save settings to SETTINGS_FILE:", e)
+
+    try:
+        with open("/tmp/settings.json", "w", encoding="utf-8") as file:
+            json.dump(settings, file, indent=4)
+    except Exception as e:
+        print("Could not save settings to /tmp/settings.json:", e)
 
 @app.get("/settings/profile")
 def get_profile():
@@ -406,14 +424,7 @@ def get_login_history():
 # API CONFIGURATION
 # =========================
 
-def load_settings():
-    with open(SETTINGS_FILE, "r", encoding="utf-8") as file:
-        return json.load(file)
-
-
-def save_settings(settings):
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as file:
-        json.dump(settings, file, indent=4)
+# Use global Vercel-safe load_settings and save_settings
 
 
 # Get API configuration
