@@ -29,21 +29,43 @@ document.querySelectorAll(".severityOption").forEach(option => {
     });
 });
 async function loadHistory() {
+    let uploads = [];
     try {
         const historyUrl = window.getApiUrl ? window.getApiUrl('/upload-history') : '/upload-history';
         const response = await fetch(historyUrl);
-        const data = await response.json();
-        console.log("HISTORY DATA:", data);
-        allUploads = data.uploads;
-        filteredUploads = allUploads;
-        currentPage = 1;
-        renderHistoryTable(filteredUploads);
-        renderPagination(filteredUploads);
-        const totalReports = data.uploads.length;
-        document.getElementById("totalReports").textContent = totalReports;
+        if (response.ok) {
+            const data = await response.json();
+            uploads = data.uploads || [];
+        }
+    } catch (error) {
+        console.warn("Backend history fetch failed, using local storage:", error);
+    }
+
+    try {
+        const localHistory = JSON.parse(localStorage.getItem("uploadHistory")) || [];
+        if (localHistory.length > 0) {
+            const existingKeys = new Set(uploads.map(u => (u.filename || "") + "_" + (u.upload_time || "")));
+            localHistory.forEach(localUpload => {
+                const key = (localUpload.filename || "") + "_" + (localUpload.upload_time || "");
+                if (!existingKeys.has(key)) {
+                    uploads.unshift(localUpload);
+                }
+            });
+        }
+    } catch (e) {
+        console.error("Error reading uploadHistory from localStorage in History.js:", e);
+    }
+
+    allUploads = uploads;
+    filteredUploads = allUploads;
+    currentPage = 1;
+    renderHistoryTable(filteredUploads);
+    renderPagination(filteredUploads);
+    const totalReports = uploads.length;
+    document.getElementById("totalReports").textContent = totalReports;
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
-        const thisMonthReports = data.uploads.filter(upload => {
+        const thisMonthReports = uploads.filter(upload => {
             const uploadDate = new Date(upload.upload_time);
             return (
                 uploadDate.getMonth() === currentMonth &&
@@ -52,13 +74,13 @@ async function loadHistory() {
         }).length;
         document.getElementById("reportsChange").textContent =`↑ ${thisMonthReports}`;
 
-        const totalFindings = data.uploads.reduce(
+        const totalFindings = uploads.reduce(
             (total, upload) => total + Number(upload.findings_count || 0),
             0
         );
         document.getElementById("totalFindings").textContent = totalFindings;
 
-        const thisMonthFindings = data.uploads
+        const thisMonthFindings = uploads
         .filter(upload => {
             const uploadDate = new Date(upload.upload_time);
             return (
@@ -73,7 +95,7 @@ async function loadHistory() {
     document.getElementById("findingsChange").textContent =`↑ ${thisMonthFindings}`;
 
     // grid 3
-    const riskScores = data.uploads.map(upload =>
+    const riskScores = uploads.map(upload =>
         calculateRiskScore(upload.findings)
     );
     const avgRiskScore = riskScores.length
@@ -84,7 +106,7 @@ async function loadHistory() {
         : 0;
     document.getElementById("avgRiskScore").textContent =
         `${avgRiskScore}%`;
-        const thisMonthUploads = data.uploads.filter(upload => {
+        const thisMonthUploads = uploads.filter(upload => {
             const uploadDate = new Date(upload.upload_time);
             return (
                 uploadDate.getMonth() === currentMonth &&
@@ -106,14 +128,14 @@ async function loadHistory() {
             `↑ ${thisMonthAvgRisk}`;
         
             // grid 4
-            const resolvedIssues = data.uploads.reduce((total, upload) => {
+            const resolvedIssues = uploads.reduce((total, upload) => {
                 return total + (upload.findings || []).filter(
                     finding => finding.status?.toLowerCase() === "fixed"
                 ).length;
             }, 0);
             document.getElementById("resolvedIssues").textContent =resolvedIssues;
 
-            const thisMonthResolved = data.uploads
+            const thisMonthResolved = uploads
     .filter(upload => {
         const uploadDate = new Date(upload.upload_time);
 
@@ -135,8 +157,8 @@ async function loadHistory() {
     let medium = 0;
     let low = 0;
 
-    data.uploads.forEach(upload => {
-        upload.findings.forEach(finding => {
+    uploads.forEach(upload => {
+        (upload.findings || []).forEach(finding => {
             if (finding.severity === "Critical") {
                 critical++;
             }
@@ -173,14 +195,16 @@ async function loadHistory() {
         const mediumEnd = highEnd + mediumPercent;
         const lowEnd = mediumEnd + lowPercent;
         const riskDonut = document.getElementById("riskDonut");
-        riskDonut.style.background = `
-            conic-gradient(
-                #ef4444 0% ${criticalEnd}%,
-                #f97316 ${criticalEnd}% ${highEnd}%,
-                #eab308 ${highEnd}% ${mediumEnd}%,
-                #22c55e ${mediumEnd}% ${lowEnd}%
-            )
-        `;
+        if (riskDonut) {
+            riskDonut.style.background = `
+                conic-gradient(
+                    #ef4444 0% ${criticalEnd}%,
+                    #f97316 ${criticalEnd}% ${highEnd}%,
+                    #eab308 ${highEnd}% ${mediumEnd}%,
+                    #22c55e ${mediumEnd}% ${lowEnd}%
+                )
+            `;
+        }
     document.getElementById("criticalRiskCount").textContent = critical;
     document.getElementById("criticalRiskPercent").textContent = `${criticalPercent}%`;
 
@@ -196,9 +220,10 @@ async function loadHistory() {
     document.getElementById("totalRiskFindings").textContent = totalRiskFindings;
         
             const recentActivity = document.getElementById("recentActivity");
-            const recentUploads = data.uploads.slice(0, 4);
-            recentActivity.innerHTML = "";
-            recentUploads.forEach(upload => {
+            if (recentActivity) {
+                const recentUploads = uploads.slice(0, 4);
+                recentActivity.innerHTML = "";
+                recentUploads.forEach(upload => {
                  const activity = document.createElement("div");
                  const formattedTime = formatUploadTime(upload.upload_time);
                  activity.className = "grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-3 items-start";
@@ -220,13 +245,11 @@ async function loadHistory() {
                        ${formattedTime.time}
                  </p>
              `;
-             recentActivity.appendChild(activity);
-
             });
-    } catch (error) {
-        console.error("ERROR LOADING HISTORY:", error);
     }
-    lucide.createIcons();
+    if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+    }
 }
 function getFileStyle(fileType) {
     const type = fileType.toUpperCase();

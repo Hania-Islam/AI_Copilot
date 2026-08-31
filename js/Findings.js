@@ -8,34 +8,69 @@ const findingsPerPage = 8;
 let filteredFindings = [];
 let selectedFinding = null;
 async function loadFindings() {
+    let findingsList = [];
     try {
         const findingsUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
         const response = await fetch(findingsUrl);
-        const data = await response.json();
-        console.log("FINDINGS DATA:", data);
-        allFindings = data.findings;
-        filteredFindings = allFindings;
-        currentPage=1;
-        displayPage(allFindings)
-        updatePagination(allFindings)
-        updateCriticalCard(data.findings);
-        updateHighCard(data.findings);
-        updateMediumCard(data.findings)
-        updateLowCard(data.findings)
-        document.getElementById("totalFindingsCount").textContent = data.findings.length;
-        updateTotalFindingsPercentage( data.findings.length, data.previous_findings_count
-        );
+        if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.findings)) {
+                findingsList = data.findings;
+            }
+        }
+    } catch (error) {
+        console.warn("Backend findings fetch failed, using local storage:", error);
+    }
 
+    try {
+        const localHistory = JSON.parse(localStorage.getItem("uploadHistory")) || [];
+        if (localHistory.length > 0) {
+            const existingIds = new Set(findingsList.map(f => f.id || f.title));
+            localHistory.forEach(upload => {
+                const uploadFindings = upload.findings || [];
+                uploadFindings.forEach(finding => {
+                    const id = finding.id || finding.title;
+                    if (!existingIds.has(id)) {
+                        findingsList.unshift({
+                            ...finding,
+                            upload_time: upload.upload_time,
+                            filename: upload.filename
+                        });
+                        existingIds.add(id);
+                    }
+                });
+            });
+        }
+    } catch (e) {
+        console.error("Error reading uploadHistory from localStorage in Findings.js:", e);
+    }
+
+    allFindings = findingsList;
+    filteredFindings = allFindings;
+    currentPage = 1;
+    displayPage(allFindings);
+    updatePagination(allFindings);
+    updateCriticalCard(allFindings);
+    updateHighCard(allFindings);
+    updateMediumCard(allFindings);
+    updateLowCard(allFindings);
+    const totalCountEl = document.getElementById("totalFindingsCount");
+    if (totalCountEl) {
+        totalCountEl.textContent = allFindings.length;
+    }
+
+    try {
         const severityUrl = window.getApiUrl ? window.getApiUrl('/severity-history') : '/severity-history';
         const severityResponse = await fetch(severityUrl);
-        const severityHistory = await severityResponse.json();
-        updateCriticalGraph(severityHistory);
-        updateHighGraph(severityHistory);
-        updateMediumGraph(severityHistory);
-        updateLowGraph(severityHistory);
-
-    } catch (error) {
-        console.error("ERROR LOADING FINDINGS:", error);
+        if (severityResponse.ok) {
+            const severityHistory = await severityResponse.json();
+            updateCriticalGraph(severityHistory);
+            updateHighGraph(severityHistory);
+            updateMediumGraph(severityHistory);
+            updateLowGraph(severityHistory);
+        }
+    } catch (err) {
+        console.warn("Severity history fetch offline:", err);
     }
 }
 

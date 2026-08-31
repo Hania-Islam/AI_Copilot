@@ -76,20 +76,36 @@ loadDashboardData();
 
 // load dashbaord data
 async function loadDashboardData() {
+    let uploads = [];
     try {
         console.log("Loading dashboard data...");
         const apiUrl = window.getApiUrl ? window.getApiUrl('/upload-history') : '/upload-history';
         const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error("Failed to load upload history");
+        if (response.ok) {
+            const data = await response.json();
+            uploads = data.uploads || [];
         }
-        const data = await response.json();
-        console.log("Dashboard history:", data);
-        const uploads = data.uploads || [];
-        updateDashboard(uploads);
     } catch (error) {
-        console.error("Dashboard error:", error);
+        console.warn("Backend upload history offline or failed, using local storage:", error);
     }
+
+    try {
+        const localHistory = JSON.parse(localStorage.getItem("uploadHistory")) || [];
+        if (localHistory.length > 0) {
+            const existingKeys = new Set(uploads.map(u => (u.filename || "") + "_" + (u.upload_time || "")));
+            localHistory.forEach(localUpload => {
+                const key = (localUpload.filename || "") + "_" + (localUpload.upload_time || "");
+                if (!existingKeys.has(key)) {
+                    uploads.unshift(localUpload);
+                }
+            });
+        }
+    } catch (e) {
+        console.error("Error reading uploadHistory from localStorage:", e);
+    }
+
+    console.log("Dashboard combined uploads:", uploads);
+    updateDashboard(uploads);
 }
 
 // update dashboard
