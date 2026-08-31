@@ -101,9 +101,10 @@ async function loadFindings() {
             else cleaned.cvss = 0.0;
         }
 
-        // Deduplicate using filename + id + title key (preserving new findings per file upload)
+        // Deduplicate using filename + report_id/upload_time + id + title key
         const fn = (cleaned.filename || f.filename || '').toLowerCase().trim();
-        const key = `${fn}_${cleaned.id || index}_${cleaned.title.toLowerCase().trim()}`;
+        const rptId = (cleaned.report_id || f.report_id || cleaned.upload_time || f.upload_time || '').toString().trim();
+        const key = `${fn}_${rptId}_${cleaned.id || index}_${cleaned.title.toLowerCase().trim()}`;
         if (!uniqueKeys.has(key)) {
             uniqueKeys.add(key);
             cleanedList.push(cleaned);
