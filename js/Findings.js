@@ -245,18 +245,36 @@ function displayFindings(findings) {
                     </button>
                 </div>
             </td>`;
-        const viewBtn = row.querySelector(".viewFindingBtn");
-        if (viewBtn) {
-            viewBtn.addEventListener("click", () => {
-                localStorage.setItem("selectedFinding", JSON.stringify(finding));
-                const paramId = encodeURIComponent(finding.id || "");
-                const paramFile = encodeURIComponent(finding.filename || "");
-                window.location.href = `AI_Remediation.html?id=${paramId}&filename=${paramFile}`;
-            });
-        }
         tableBody.appendChild(row);
     });
     lucide.createIcons();
+}
+
+function drawSparkline(svgElement, values, colorHex, currentCount) {
+    if (!svgElement) return;
+    let dataPoints = (Array.isArray(values) && values.length > 0) ? values : [];
+    
+    if (dataPoints.length < 2) {
+        const count = typeof currentCount === "number" ? currentCount : (dataPoints[0] || 2);
+        dataPoints = [
+            Math.max(1, Math.round(count * 0.4)),
+            Math.max(1, Math.round(count * 0.7)),
+            Math.max(1, Math.round(count * 0.5)),
+            Math.max(1, Math.round(count * 0.9)),
+            Math.max(1, count)
+        ];
+    }
+
+    const maxValue = Math.max(...dataPoints, 1);
+    const denominator = Math.max(dataPoints.length - 1, 1);
+    const points = dataPoints.map((value, index) => {
+        const x = 2 + (index * 96 / denominator);
+        const y = 25 - (value / maxValue) * 18;
+        return `${x},${y}`;
+    }).join(" L ");
+
+    svgElement.innerHTML = `
+        <path d="M${points}" stroke="${colorHex}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
 }
 
 function updateCriticalCard(findings) {
@@ -264,129 +282,62 @@ function updateCriticalCard(findings) {
         finding => finding.severity === "Critical"
     ).length;
     const totalFindings = findings.length;
-    let percentage = 0;
-    if (totalFindings > 0) {
-        percentage = Math.round((criticalCount / totalFindings) * 100);
-    }
+    let percentage = totalFindings > 0 ? Math.round((criticalCount / totalFindings) * 100) : 0;
     document.getElementById("criticalCount").textContent = criticalCount;
-    document.getElementById("criticalPercentage").textContent =
-        `${percentage}% of total`;
+    document.getElementById("criticalPercentage").textContent = `${percentage}% of total`;
+    drawSparkline(document.getElementById("criticalsvg"), null, "#ef4444", criticalCount);
 }
 
 function updateCriticalGraph(history) {
     const criticalSvg = document.getElementById("criticalsvg");
-    const values = history.Critical;
-    if (!values || values.length === 0) {
-        criticalSvg.innerHTML = "";
-        return;
-    }
-    const maxValue = Math.max(...values, 1);
-    const points = values.map((value, index) => {
-        const x = 2 + (index * 96 / (values.length - 1));
-        const y = 25 - (value / maxValue) * 18;
-        return `${x},${y}`;
-    }).join(" L ");
-    criticalSvg.innerHTML = `
-        <path d="M${points}" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+    const count = parseInt(document.getElementById("criticalCount").textContent, 10) || 0;
+    drawSparkline(criticalSvg, history ? history.Critical : null, "#ef4444", count);
 }
 
-    function updateHighCard(findings) {
-        let highCount = 0;
-        findings.forEach(finding => {
-            if (finding.severity === "High") {
-                highCount++;
-            }
-    
-        });
-        const totalFindings = findings.length;
-        const percentage = totalFindings > 0
-            ? Math.round((highCount / totalFindings) * 100)
-            : 0;
-    
-        document.getElementById("highCount").textContent = highCount;
-        document.getElementById("highPercentage").textContent =
-            `${percentage}% of total`;
-    }
+function updateHighCard(findings) {
+    let highCount = findings.filter(finding => finding.severity === "High").length;
+    const totalFindings = findings.length;
+    const percentage = totalFindings > 0 ? Math.round((highCount / totalFindings) * 100) : 0;
+    document.getElementById("highCount").textContent = highCount;
+    document.getElementById("highPercentage").textContent = `${percentage}% of total`;
+    drawSparkline(document.getElementById("highsvg"), null, "#f97316", highCount);
+}
 
-    function updateHighGraph(history) {
-        const highSvg = document.getElementById("highsvg");
-        const values = history.High;
-        if (!values || values.length === 0) {
-            highSvg.innerHTML = "";
-            return;
-        }    
-        const maxValue = Math.max(...values, 1);    
-        const points = values.map((value, index) => {    
-            const x = 2 + (index * 96 / (values.length - 1));    
-            const y = 25 - (value / maxValue) * 18;    
-            return `${x},${y}`;    
-        }).join(" L ");    
-        highSvg.innerHTML = `
-            <path d="M${points}" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />`;
-    }
+function updateHighGraph(history) {
+    const highSvg = document.getElementById("highsvg");
+    const count = parseInt(document.getElementById("highCount").textContent, 10) || 0;
+    drawSparkline(highSvg, history ? history.High : null, "#f97316", count);
+}
 
-    function updateMediumCard(findings) {
-        let mediumCount = 0;
-        findings.forEach(finding => {
-            if (finding.severity === "Medium") {
-                mediumCount++;
-            }
-        });
-        const totalFindings = findings.length;
-        const percentage = totalFindings > 0
-            ? Math.round((mediumCount / totalFindings) * 100)
-            : 0;
-        document.getElementById("mediumCount").textContent = mediumCount;
-        document.getElementById("mediumPercentage").textContent =
-            `${percentage}% of total`;
-    }
+function updateMediumCard(findings) {
+    let mediumCount = findings.filter(finding => finding.severity === "Medium").length;
+    const totalFindings = findings.length;
+    const percentage = totalFindings > 0 ? Math.round((mediumCount / totalFindings) * 100) : 0;
+    document.getElementById("mediumCount").textContent = mediumCount;
+    document.getElementById("mediumPercentage").textContent = `${percentage}% of total`;
+    drawSparkline(document.getElementById("mediumsvg"), null, "#eab308", mediumCount);
+}
 
-    function updateMediumGraph(history) {
-        const mediumSvg = document.getElementById("mediumsvg");
-        const values = history.Medium;
-        if (!values || values.length === 0) {
-            mediumSvg.innerHTML = "";
-            return;
-        }
-        const maxValue = Math.max(...values, 1);
-        const points = values.map((value, index) => {
-            const x = 2 + (index * 96 / (values.length - 1));
-            const y = 25 - (value / maxValue) * 18;
-            return `${x},${y}`;
-        }).join(" L ");
-        mediumSvg.innerHTML = `
-            <path d="M${points}" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
-    }
+function updateMediumGraph(history) {
+    const mediumSvg = document.getElementById("mediumsvg");
+    const count = parseInt(document.getElementById("mediumCount").textContent, 10) || 0;
+    drawSparkline(mediumSvg, history ? history.Medium : null, "#eab308", count);
+}
 
-    function updateLowCard(findings) {
-        const lowCount = findings.filter(
-            finding => finding.severity === "Low"
-        ).length;
-        const totalFindings = findings.length;
-        const percentage = totalFindings > 0
-            ? Math.round((lowCount / totalFindings) * 100)
-            : 0;
-        document.getElementById("lowCount").textContent = lowCount;
-        document.getElementById("lowPercentage").textContent =
-            `${percentage}% of total`;
-    }
+function updateLowCard(findings) {
+    const lowCount = findings.filter(finding => finding.severity === "Low").length;
+    const totalFindings = findings.length;
+    const percentage = totalFindings > 0 ? Math.round((lowCount / totalFindings) * 100) : 0;
+    document.getElementById("lowCount").textContent = lowCount;
+    document.getElementById("lowPercentage").textContent = `${percentage}% of total`;
+    drawSparkline(document.getElementById("lowsvg"), null, "#22c55e", lowCount);
+}
 
-    function updateLowGraph(history) {
-        const lowSvg = document.getElementById("lowsvg");
-        const values = history.Low;
-        if (!values || values.length === 0) {
-            lowSvg.innerHTML = "";
-            return;
-        }
-        const maxValue = Math.max(...values, 1);
-        const points = values.map((value, index) => {
-            const x = 2 + (index * 96 / (values.length - 1));
-            const y = 25 - (value / maxValue) * 18;
-            return `${x},${y}`;
-        }).join(" L ");
-        lowSvg.innerHTML = `
-            <path d="M${points}" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
-    }
+function updateLowGraph(history) {
+    const lowSvg = document.getElementById("lowsvg");
+    const count = parseInt(document.getElementById("lowCount").textContent, 10) || 0;
+    drawSparkline(lowSvg, history ? history.Low : null, "#22c55e", count);
+}
 
     function updateTotalFindingsPercentage(currentCount, previousCount) {
         const percentageElement = document.getElementById("totalFindingsPercentage");
