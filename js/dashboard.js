@@ -1,4 +1,30 @@
 
+function parseDateString(dateStr) {
+    if (!dateStr) return new Date(NaN);
+    if (dateStr instanceof Date) return dateStr;
+    let cleaned = String(dateStr).trim();
+    let normalized = cleaned.replace(/^(\d{4})[\./](\d{1,2})[\./](\d{1,2})/, '$1-$2-$3');
+    normalized = normalized.replace(/a\.m\./i, 'AM').replace(/p\.m\./i, 'PM');
+
+    const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2})[:.](\d{1,2})(?:[:.](\d{1,2}))?\s*(AM|PM)?)?/i);
+    if (match) {
+        let year = parseInt(match[1], 10);
+        let month = parseInt(match[2], 10) - 1;
+        let day = parseInt(match[3], 10);
+        let hour = match[4] ? parseInt(match[4], 10) : 0;
+        let min = match[5] ? parseInt(match[5], 10) : 0;
+        let sec = match[6] ? parseInt(match[6], 10) : 0;
+        let ampm = match[7] ? match[7].toUpperCase() : null;
+        if (ampm === "PM" && hour < 12) hour += 12;
+        if (ampm === "AM" && hour === 12) hour = 0;
+        return new Date(year, month, day, hour, min, sec);
+    }
+    
+    let d = new Date(normalized);
+    if (!isNaN(d.getTime())) return d;
+    return new Date(NaN);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     applySavedTheme()
 const riskDropdownBtn = document.getElementById("riskDropdownBtn");
@@ -76,36 +102,25 @@ loadDashboardData();
 
 // load dashbaord data
 async function loadDashboardData() {
-    let uploads = [];
+    let backendUploads = [];
     try {
         console.log("Loading dashboard data...");
         const apiUrl = window.getApiUrl ? window.getApiUrl('/upload-history') : '/upload-history';
         const response = await fetch(apiUrl);
         if (response.ok) {
             const data = await response.json();
-            uploads = data.uploads || [];
+            if (data && Array.isArray(data.uploads)) {
+                backendUploads = data.uploads;
+            }
         }
     } catch (error) {
-        console.warn("Backend upload history offline or failed, using local storage:", error);
+        console.warn("Backend upload history offline or failed:", error);
     }
 
-    try {
-        const localHistory = JSON.parse(localStorage.getItem("uploadHistory")) || [];
-        if (localHistory.length > 0) {
-            const existingKeys = new Set(uploads.map(u => (u.filename || "") + "_" + (u.upload_time || "")));
-            localHistory.forEach(localUpload => {
-                const key = (localUpload.filename || "") + "_" + (localUpload.upload_time || "");
-                if (!existingKeys.has(key)) {
-                    uploads.unshift(localUpload);
-                }
-            });
-        }
-    } catch (e) {
-        console.error("Error reading uploadHistory from localStorage:", e);
-    }
+    backendUploads.sort((a, b) => parseDateString(b.upload_time) - parseDateString(a.upload_time));
 
-    console.log("Dashboard combined uploads:", uploads);
-    updateDashboard(uploads);
+    console.log("Dashboard uploads:", backendUploads);
+    updateDashboard(backendUploads);
 }
 
 // update dashboard
@@ -144,6 +159,7 @@ function updateDashboard(uploads) {
             }
         });
     });
+    allFindings.sort((a, b) => parseDateString(b.upload_time) - parseDateString(a.upload_time));
     console.log("Total findings:", totalFindings);
     console.log("Critical:", criticalFindings);
     console.log("High:", highFindings);
@@ -169,10 +185,10 @@ function updateDashboard(uploads) {
     // Last Analysis
     updateLastAnalysis(uploads);
     // Security Score
-    updateSecurityScore(totalFindings,criticalFindings,highFindings);
+    updateSecurityScore(totalFindings, criticalFindings, highFindings, mediumFindings, lowFindings);
     updateSecurityScoreChange(uploads);
     // Risk Overview
-    updateRiskOverview(totalFindings,criticalFindings,highFindings);
+    updateRiskOverview(totalFindings, criticalFindings, highFindings, mediumFindings, lowFindings);
     updateRiskOverviewChange(uploads);
     updateRiskTrend(uploads);
     // remediation
@@ -180,9 +196,12 @@ function updateDashboard(uploads) {
     // Top Vulnerable Assets
     updateVulnerableAssets(allFindings);
 
-    const uniqueAssets = new Set(allFindings.map((finding) => finding.endpoint));
+    const uniqueAssets = new Set(allFindings.map((finding) => finding.endpoint).filter(Boolean));
     setDashboardValue("assetsMonitoredValue", uniqueAssets.size);
     updateAssetsMonitoredChange(uploads);
+
+    const recCount = allFindings.filter(f => f.recommendation && String(f.recommendation).trim() !== "").length;
+    setDashboardValue("aiRecommendationsValue", recCount || allFindings.length);
 }
 
 function updateReportsAnalyzedChange(uploads) {
@@ -201,8 +220,8 @@ function updateReportsAnalyzedChange(uploads) {
     let previousMonthUploads = 0;
 
     uploads.forEach((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
         if (
@@ -276,8 +295,8 @@ function updateTotalFindingsChange(uploads) {
     let previousMonthFindings = 0;
 
     uploads.forEach((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
 
@@ -348,8 +367,8 @@ function updateCriticalFindingsChange(uploads) {
     let previousCritical = 0;
 
     uploads.forEach((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
         const findings = upload.findings || [];
@@ -620,19 +639,19 @@ function updateLastAnalysis(uploads) {
 }
 
 // SECURITY SCORE
-function updateSecurityScore(total,critical,high) {
+function updateSecurityScore(total, critical, high, medium, low) {
     if (total === 0) {
-        setDashboardValue("securityScoreValue","100");
+        setDashboardValue("securityScoreValue", "100");
+        const circle = document.getElementById("securityScoreCircle");
+        if (circle) circle.style.background = `conic-gradient(#2563eb 100%, #1e293b 100%)`;
         return;
     }
 
-    // Simple project scoring formula
-    let score = 100;
-    score -= critical * 5;
-    score -= high * 2;
+    const weightedRisk = (critical * 1.0) + (high * 0.7) + ((medium || 0) * 0.3) + ((low || 0) * 0.1);
+    const riskValue = Math.max(0, Math.min(100, Math.round((weightedRisk / total) * 100)));
+    const score = 100 - riskValue;
 
-    score = Math.max( 0,Math.min(100, score));
-    setDashboardValue("securityScoreValue",Math.round(score));
+    setDashboardValue("securityScoreValue", Math.round(score));
 
     const circle = document.getElementById("securityScoreCircle");
     if (circle) {
@@ -642,19 +661,16 @@ function updateSecurityScore(total,critical,high) {
 
 
 // RISK OVERVIEW
-function updateRiskOverview(total,critical,high) {
-    console.log("RISK DATA:", {
-        total: total,
-        critical: critical,
-        high: high
-    });
+function updateRiskOverview(total, critical, high, medium, low) {
     if (total === 0) {
-        setDashboardValue("riskPercentage","0%");
+        setDashboardValue("riskPercentage", "0%");
+        setDashboardValue("riskLabel", "Low Risk");
         return;
     }
-    const risk =Math.round(((critical * 1) + (high * 0.6))/ total* 100);
-    const riskValue =Math.max(0,Math.min(100, risk));
-    setDashboardValue("riskPercentage",`${riskValue}%`);
+    const weightedRisk = (critical * 1.0) + (high * 0.7) + ((medium || 0) * 0.3) + ((low || 0) * 0.1);
+    const risk = Math.round((weightedRisk / total) * 100);
+    const riskValue = Math.max(0, Math.min(100, risk));
+    setDashboardValue("riskPercentage", `${riskValue}%`);
     let label = "Low Risk";
     if (riskValue >= 70) {
         label = "High Risk";
@@ -662,13 +678,13 @@ function updateRiskOverview(total,critical,high) {
     else if (riskValue >= 40) {
         label = "Medium Risk";
     }
-    setDashboardValue("riskLabel",label);
+    setDashboardValue("riskLabel", label);
 
     // Needle rotation
-    const needle =document.getElementById("riskNeedle");
+    const needle = document.getElementById("riskNeedle");
     if (needle) {
-        const rotation =-90 + (riskValue * 1.8);
-        needle.style.transform =`rotate(${rotation}deg)`;
+        const rotation = -90 + (riskValue * 1.8);
+        needle.style.transform = `rotate(${rotation}deg)`;
     }
 }
 
@@ -710,8 +726,8 @@ function updateAssetsMonitoredChange(uploads) {
     const currentMonthAssets = new Set();
     const previousMonthAssets = new Set();
     uploads.forEach((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
         const findings = upload.findings || [];
@@ -755,9 +771,8 @@ function updateActiveThreatsChange(uploads) {
     let todayThreats = 0;
     let yesterdayThreats = 0;
     uploads.forEach((upload) => {
-
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
 
@@ -824,8 +839,8 @@ function updateSecurityScoreChange(uploads) {
     let previousFindings = [];
 
     uploads.forEach((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
         const findings = upload.findings || [];
@@ -900,8 +915,8 @@ function updateRiskOverviewChange(uploads) {
     let previousFindings = [];
 
     uploads.forEach((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        if (isNaN(uploadDate)) {
+        const uploadDate = parseDateString(upload.upload_time);
+        if (isNaN(uploadDate.getTime())) {
             return;
         }
         const findings = upload.findings || [];
@@ -985,8 +1000,8 @@ function updateRiskTrend(uploads) {
     const cutoffDate = new Date(now);
     cutoffDate.setDate(now.getDate() - selectedRiskPeriod);
     uploads = uploads.filter((upload) => {
-        const uploadDate = new Date(upload.upload_time);
-        return !isNaN(uploadDate) && uploadDate >= cutoffDate;
+        const uploadDate = parseDateString(upload.upload_time);
+        return !isNaN(uploadDate.getTime()) && uploadDate >= cutoffDate;
     });
     // Convert uploads into risk-score data
     const riskData = [];

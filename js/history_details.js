@@ -1,16 +1,55 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     console.log("HISTORY DETAILS JS UPDATED");
-    const selectedUpload = JSON.parse(
-        localStorage.getItem("selectedUpload")
-    );
-    console.log("SELECTED UPLOAD:", selectedUpload);
+    let selectedUpload = null;
+    try {
+        selectedUpload = JSON.parse(localStorage.getItem("selectedUpload"));
+    } catch (e) {}
+
+    if (!selectedUpload) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetFilename = urlParams.get("filename");
+        const targetId = urlParams.get("id");
+
+        let uploads = [];
+        try {
+            const historyUrl = window.getApiUrl ? window.getApiUrl('/upload-history') : '/upload-history';
+            const response = await fetch(historyUrl);
+            if (response.ok) {
+                const data = await response.json();
+                uploads = data.uploads || [];
+            }
+        } catch (err) {}
+
+        if (uploads.length === 0) {
+            try {
+                uploads = JSON.parse(localStorage.getItem("uploadHistory")) || [];
+            } catch (e) {}
+        }
+
+        if (targetFilename) {
+            selectedUpload = uploads.find(u => u.filename === targetFilename);
+        } else if (targetId) {
+            selectedUpload = uploads.find(u => String(u.id) === String(targetId));
+        }
+
+        if (!selectedUpload && uploads.length > 0) {
+            selectedUpload = uploads[0];
+        }
+    }
+
+    if (!selectedUpload) {
+        console.warn("No upload details found for history view");
+        return;
+    }
 
     // FILE INFORMATION
-    document.getElementById("fileName").textContent = selectedUpload.filename;
-    document.getElementById("fileType").textContent = selectedUpload.file_type;
-    document.getElementById("findingsCount").textContent = selectedUpload.findings_count;
-    document.getElementById("fileStatus").lastChild.textContent = selectedUpload.status;
-    document.getElementById("uploadTime").textContent = `Uploaded: ${selectedUpload.upload_time}`;
+    document.getElementById("fileName").textContent = selectedUpload.filename || "Report Details";
+    document.getElementById("fileType").textContent = selectedUpload.file_type || "TXT";
+    document.getElementById("findingsCount").textContent = selectedUpload.findings_count || (selectedUpload.findings ? selectedUpload.findings.length : 0);
+    if (document.getElementById("fileStatus")) {
+        document.getElementById("fileStatus").lastChild.textContent = selectedUpload.status || "Completed";
+    }
+    document.getElementById("uploadTime").textContent = `Uploaded: ${selectedUpload.upload_time || "N/A"}`;
 
     // RISK SCORE
     const cvssScores = selectedUpload.findings

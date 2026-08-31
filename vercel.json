@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/upload",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/findings",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/upload-history",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/settings/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/profile_pictures/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+FINDING 1:
+Title: Unauthenticated Remote Code Execution in API Gateway
+Severity: Critical
+CVSS: 9.9
+Endpoint: /api/v2/gateway/exec
+Description: Remote code execution vulnerability in routing middleware allows unauthenticated attackers to execute shell commands.
+Evidence: POST /api/v2/gateway/exec with payload `$(whoami)` returns root response.
+Recommendation: Update API Gateway middleware to version 4.2.1 and sanitize all request parameters.
+Impact: Total server compromise and full system administrative takeover.
+Status: Open
+Date Detected: 2026-08-31
+
+FINDING 2:
+Title: Broken Object Level Authorization in Billing API
+Severity: High
+CVSS: 8.7
+Endpoint: /api/v1/billing/invoices/9941
+Description: Users can view and download invoices belonging to other customer accounts by tampering with invoice numbers.
+Evidence: GET /api/v1/billing/invoices/9941 returned invoice details for corporate account 104.
+Recommendation: Enforce tenant authorization policy check on invoice object IDs.
+Impact: Confidential financial information leak and regulatory non-compliance.
+Status: Open
+Date Detected: 2026-08-31
+
+FINDING 3:
+Title: Weak JWT Signature Algorithm Allowed
+Severity: Medium
+CVSS: 6.8
+Endpoint: /auth/token/verify
+Description: The authentication server accepts JWT tokens signed with 'none' algorithm.
+Evidence: Submitting token with header {"alg":"none"} bypasses signature verification.
+Recommendation: Explicitly restrict accepted JWT algorithms to RS256 or HS256.
+Impact: Authentication bypass for arbitrary user identity claims.
+Status: Open
+Date Detected: 2026-08-31

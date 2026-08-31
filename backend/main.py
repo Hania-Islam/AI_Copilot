@@ -10,6 +10,8 @@ from pydantic import BaseModel
 import os
 import io
 import json
+import csv
+import re
    
 app = FastAPI()
 
@@ -42,12 +44,21 @@ app.mount(
 HISTORY_FILE = os.path.join(BASE_DIR, "upload_history.json")
 
 def load_history():
+    tmp_path = "/tmp/upload_history.json"
+    if os.path.exists(tmp_path):
+        try:
+            with open(tmp_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                if data and isinstance(data, list) and len(data) > 0:
+                    return data
+        except Exception as e:
+            print("Error loading history from /tmp:", e)
+
     candidates = [
         HISTORY_FILE,
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "upload_history.json"),
         os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "upload_history.json"),
-        os.path.join(os.getcwd(), "upload_history.json"),
-        "/tmp/upload_history.json"
+        os.path.join(os.getcwd(), "upload_history.json")
     ]
     for filepath in candidates:
         if os.path.exists(filepath):
@@ -61,25 +72,37 @@ def load_history():
     return []
 
 def save_history(history):
+    saved = False
     try:
         with open(HISTORY_FILE, "w", encoding="utf-8") as file:
             json.dump(history, file, indent=4)
+            saved = True
     except Exception as e:
-        try:
-            with open("/tmp/upload_history.json", "w", encoding="utf-8") as file:
-                json.dump(history, file, indent=4)
-        except Exception:
-            pass
+        print("Could not write to HISTORY_FILE, using /tmp fallback:", e)
+
+    try:
+        with open("/tmp/upload_history.json", "w", encoding="utf-8") as file:
+            json.dump(history, file, indent=4)
+            saved = True
+    except Exception as e:
+        print("Could not write to /tmp/upload_history.json:", e)
 
 SETTINGS_FILE = os.path.join(BASE_DIR, "settings.json")
 
 def load_settings():
+    tmp_path = "/tmp/settings.json"
+    if os.path.exists(tmp_path):
+        try:
+            with open(tmp_path, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except Exception:
+            pass
+
     candidates = [
         SETTINGS_FILE,
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.json"),
         os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "settings.json"),
-        os.path.join(os.getcwd(), "settings.json"),
-        "/tmp/settings.json"
+        os.path.join(os.getcwd(), "settings.json")
     ]
     for filepath in candidates:
         if os.path.exists(filepath):
@@ -520,79 +543,277 @@ async def get_notifications():
         "unread_count": unread_count
     }
         
-def analyze_report(report_text):
-    print("ANALYZING REPORT...")
-    findings = report_text.split("FINDING ")[1:]
-    print("NUMBER OF FINDINGS:", len(findings))
-    all_findings = []
-    for finding_text in findings:
-        print("CURRENT FINDING:")
-        print(finding_text)
-        # Extracting finding id
-        finding_id = finding_text.split("\n")[0].strip()
-        print("FINDING ID:", finding_id)
-        # extracting title
-        finding_title = finding_text.split("\n")[1].replace("Title:", "").strip()
-        print("FINDING TITLE:", finding_title)
-        # extracting severity
-        finding_severity = finding_text.split("\n")[2].replace("Severity:", "").strip()
-        print("FINDING SEVERITY:", finding_severity)
-        # extracting affected Endpoint
-        finding_endpoint = finding_text.split("\n")[3].replace("Affected Endpoint:", "").strip()
-        print("FINDING ENDPOINT:", finding_endpoint)
-        # extracting description
-        finding_description = finding_text.split("\n")[4].replace("Description:", "").strip()
-        print("FINDING DESCRIPTION:", finding_description)
-        # extracting evidence
-        finding_evidence = finding_text.split("\n")[5].replace("Evidence:", "").strip()
-        print("FINDING EVIDENCE:", finding_evidence)
-        # extracting recommendation
-        finding_recommendation = finding_text.split("\n")[6].replace("Recommendation:", "").strip()
-        print("FINDING RECOMMENDATION:", finding_recommendation)
-        
-        finding = {
-            "id": finding_id,
-            "title": finding_title,
-            "severity": finding_severity,
-            "endpoint": finding_endpoint,
-            "description": finding_description,
-            "evidence": finding_evidence,
-            "recommendation": finding_recommendation,
-            "status": "Open",
-            "date_detected": datetime.now().strftime("%Y-%m-%d")
-        }
-        if "Cross-Site Scripting" in finding_title:
-            finding_type = "XSS"
-        elif "SQL Injection" in finding_title:
-            finding_type = "Injection"
-        elif "Password" in finding_title:
-            finding_type = "Authentication"
-        elif "Access Control" in finding_title:
-            finding_type = "Access Control"
-        elif "Authentication" in finding_title:
-            finding_type = "Authentication"
-        elif "Configuration" in finding_title or "Misconfiguration" in finding_title:
-            finding_type = "Configuration"
-        elif "Security Headers" in finding_title:
-            finding_type = "Security Header"
-        elif "Information Disclosure" in finding_title:
-            finding_type = "Information Leak"
-        elif "Information Leak" in finding_title:
-            finding_type = "Information Leak"
-        elif "Data Exposure" in finding_title:
-            finding_type = "Data Exposure"
+def normalize_finding_dict(finding: dict, fallback_date: str = None) -> dict:
+    if not isinstance(finding, dict):
+        return finding
+    
+    date_val = finding.get("date_detected") or finding.get("date")
+    if not date_val or str(date_val).strip() == "" or str(date_val).strip().lower() in ["undefined", "null", "none"]:
+        if fallback_date and str(fallback_date).strip() and str(fallback_date).strip().lower() not in ["undefined", "null", "none"]:
+            d_match = re.search(r'\d{4}-\d{2}-\d{2}', str(fallback_date))
+            if d_match:
+                date_val = d_match.group(0)
+            else:
+                date_val = str(fallback_date).strip().split(" ")[0]
         else:
-            finding_type = "Other"
+            date_val = datetime.now().strftime("%Y-%m-%d")
+    else:
+        d_match = re.search(r'\d{4}-\d{2}-\d{2}', str(date_val))
+        if d_match:
+            date_val = d_match.group(0)
+        else:
+            date_val = str(date_val).strip().split(" ")[0]
+
+    finding["date_detected"] = date_val
+    return finding
+
+def create_finding_object(id_val, title, severity, endpoint, description, evidence, recommendation, cvss=None, impact="", status="Open", date_detected=None, idx=1, report_id="", filename=""):
+    severity_clean = severity.strip().capitalize() if severity else "Medium"
+    if severity_clean not in ["Critical", "High", "Medium", "Low"]:
+        sev_lower = (severity or "").lower()
+        if "crit" in sev_lower: severity_clean = "Critical"
+        elif "high" in sev_lower: severity_clean = "High"
+        elif "med" in sev_lower: severity_clean = "Medium"
+        elif "low" in sev_lower: severity_clean = "Low"
+        else: severity_clean = "Medium"
+    
+    cvss_val = 0.0
+    if cvss is not None and str(cvss).strip():
+        try:
+            match = re.search(r'\d+(?:\.\d+)?', str(cvss))
+            if match:
+                cvss_val = float(match.group())
+        except Exception:
+            cvss_val = 0.0
+    
+    if cvss_val == 0.0:
+        if severity_clean == "Critical": cvss_val = 9.8
+        elif severity_clean == "High": cvss_val = 8.5
+        elif severity_clean == "Medium": cvss_val = 6.5
+        elif severity_clean == "Low": cvss_val = 3.1
+
+    title_clean = title.strip() if title else f"Finding {idx}"
+    title_lower = title_clean.lower()
+    if "xss" in title_lower or "cross-site script" in title_lower:
+        finding_type = "XSS"
+    elif "sql" in title_lower or "injection" in title_lower:
+        finding_type = "Injection"
+    elif "password" in title_lower or "auth" in title_lower or "credential" in title_lower:
+        finding_type = "Authentication"
+    elif "access control" in title_lower or "idor" in title_lower or "authorization" in title_lower:
+        finding_type = "Access Control"
+    elif "configuration" in title_lower or "misconfig" in title_lower:
+        finding_type = "Configuration"
+    elif "header" in title_lower:
+        finding_type = "Security Header"
+    elif "disclosure" in title_lower or "leak" in title_lower or "exposure" in title_lower:
+        finding_type = "Information Leak"
+    elif "dependency" in title_lower or "outdated" in title_lower or "vulnerability" in title_lower:
+        finding_type = "Vulnerability"
+    else:
+        finding_type = "Other"
+
+    if not date_detected or str(date_detected).strip() == "" or str(date_detected).strip().lower() in ["undefined", "null", "none"]:
+        date_detected = datetime.now().strftime("%Y-%m-%d")
+    else:
+        d_match = re.search(r'\d{4}-\d{2}-\d{2}', str(date_detected))
+        if d_match:
+            date_detected = d_match.group(0)
+        else:
+            date_detected = str(date_detected).strip().split(" ")[0]
+
+    status_clean = status.strip().capitalize() if status else "Open"
+    if status_clean not in ["Open", "Resolved", "Fixed", "In Progress"]:
+        status_clean = "Open"
+
+    id_clean = str(id_val).strip() if id_val else f"{idx:03d}"
+
+    return {
+        "id": id_clean,
+        "report_id": report_id or "",
+        "filename": filename or "",
+        "title": title_clean,
+        "severity": severity_clean,
+        "endpoint": (endpoint or "/").strip(),
+        "description": (description or f"Vulnerability detected in {endpoint or 'the application'}.").strip(),
+        "evidence": (evidence or "Detailed evidence captured during report analysis.").strip(),
+        "recommendation": (recommendation or "Apply recommended security patches and validate input.").strip(),
+        "cvss": cvss_val,
+        "impact": (impact or f"Potential risk associated with {title_clean}.").strip(),
+        "status": status_clean,
+        "date_detected": date_detected,
+        "type": finding_type
+    }
+
+
+def analyze_report(report_text, filename="", report_id=""):
+    print("ANALYZING REPORT for file:", filename)
+    all_findings = []
+    
+    # 1. Try JSON parsing
+    cleaned_text = report_text.strip()
+    if cleaned_text.startswith("{") or cleaned_text.startswith("["):
+        try:
+            data = json.loads(cleaned_text)
+            raw_findings = []
+            if isinstance(data, list):
+                raw_findings = data
+            elif isinstance(data, dict):
+                raw_findings = data.get("findings", data.get("vulnerabilities", [data]))
+            
+            for idx, item in enumerate(raw_findings, 1):
+                if not isinstance(item, dict):
+                    continue
+                finding_id = str(item.get("id", f"{idx:03d}"))
+                finding_title = str(item.get("title", item.get("name", item.get("vulnerability", f"Finding {idx}"))))
+                finding_severity = str(item.get("severity", "Medium"))
+                finding_endpoint = str(item.get("endpoint", item.get("asset", item.get("url", "/"))))
+                finding_desc = str(item.get("description", ""))
+                finding_evidence = str(item.get("evidence", item.get("proof", "")))
+                finding_recom = str(item.get("recommendation", item.get("remediation", "")))
+                finding_cvss = item.get("cvss", item.get("cvss_score"))
+                finding_impact = str(item.get("impact", ""))
+                finding_status = str(item.get("status", "Open"))
+                finding_date = str(item.get("date_detected", item.get("date", datetime.now().strftime("%Y-%m-%d"))))
+
+                finding = create_finding_object(
+                    id_val=finding_id,
+                    title=finding_title,
+                    severity=finding_severity,
+                    endpoint=finding_endpoint,
+                    description=finding_desc,
+                    evidence=finding_evidence,
+                    recommendation=finding_recom,
+                    cvss=finding_cvss,
+                    impact=finding_impact,
+                    status=finding_status,
+                    date_detected=finding_date,
+                    idx=idx,
+                    report_id=report_id,
+                    filename=filename
+                )
+                all_findings.append(finding)
+            if all_findings:
+                print("Parsed JSON findings count:", len(all_findings))
+                return all_findings
+        except Exception as e:
+            print("JSON parse attempt failed, falling back to text parsing:", e)
+
+    # 2. Try CSV parsing
+    if filename.lower().endswith(".csv") or ("," in report_text and "\n" in report_text and ("title" in report_text.lower() or "severity" in report_text.lower() or "vulnerability" in report_text.lower())):
+        try:
+            reader = csv.DictReader(io.StringIO(report_text))
+            rows = list(reader)
+            if rows and any(k for k in (rows[0].keys() or []) if k and any(x in k.lower() for x in ["title", "severity", "vulnerability", "finding", "asset"])):
+                for idx, row in enumerate(rows, 1):
+                    def get_val(keys):
+                        for k, v in row.items():
+                            if k and any(key in k.lower() for key in keys):
+                                return v
+                        return ""
+                    
+                    finding_id = get_val(["id"]) or f"{idx:03d}"
+                    finding_title = get_val(["title", "vulnerability", "name"]) or f"Finding {idx}"
+                    finding_severity = get_val(["severity"]) or "Medium"
+                    finding_endpoint = get_val(["endpoint", "asset", "url", "location"]) or "/"
+                    finding_desc = get_val(["description", "details", "desc"])
+                    finding_evidence = get_val(["evidence", "proof"])
+                    finding_recom = get_val(["recommendation", "remediation", "solution", "fix"])
+                    finding_cvss = get_val(["cvss"])
+                    finding_impact = get_val(["impact"])
+                    finding_status = get_val(["status"]) or "Open"
+                    finding_date = get_val(["date", "detected"]) or datetime.now().strftime("%Y-%m-%d")
+
+                    finding = create_finding_object(
+                        id_val=finding_id,
+                        title=finding_title,
+                        severity=finding_severity,
+                        endpoint=finding_endpoint,
+                        description=finding_desc,
+                        evidence=finding_evidence,
+                        recommendation=finding_recom,
+                        cvss=finding_cvss,
+                        impact=finding_impact,
+                        status=finding_status,
+                        date_detected=finding_date,
+                        idx=idx,
+                        report_id=report_id,
+                        filename=filename
+                    )
+                    all_findings.append(finding)
+                if all_findings:
+                    print("Parsed CSV findings count:", len(all_findings))
+                    return all_findings
+        except Exception as e:
+            print("CSV parse attempt failed, falling back to text parsing:", e)
+
+    # 3. Flexible Text / PDF Parsing
+    pattern = r'(?:^|\n)(?=(?:FINDING|Finding|Vulnerability|VULNERABILITY|ISSUE|Issue|\[Finding|\d+\.\s+Finding|\d+\.\s+Vulnerability))'
+    blocks = re.split(pattern, report_text)
+    blocks = [b.strip() for b in blocks if b.strip()]
+
+    if len(blocks) <= 1:
+        blocks = re.split(r'\n\s*\n(?=[A-Za-z0-9_\-\s]+:|\bFINDING\b|\bFinding\b|\bTitle\b)', report_text)
+        blocks = [b.strip() for b in blocks if b.strip()]
+
+    for idx, block in enumerate(blocks, 1):
+        if not block:
+            continue
         
-        finding["type"] = finding_type
-            
-        print("FINDING OBJECT:")
-        print(finding)
+        def extract_field(field_names, default=""):
+            for name in field_names:
+                match = re.search(r'(?i)(?:^|\n|\b)' + re.escape(name) + r'\s*:\s*(.*?)(?=\n\s*(?:Title|Finding Title|Vulnerability|Severity|Risk Level|CVSS|CVSS Score|Affected Endpoint|Endpoint|Asset|Description|Evidence|Recommendation|Remediation|Solution|Impact|Status|Date|Date Detected|Detected On|FINDING|Finding|Vulnerability)\s*:|\Z)', block, re.DOTALL)
+                if match:
+                    val = match.group(1).strip()
+                    return val
+            return default
+
+        finding_id_match = re.search(r'(?i)(?:FINDING|Finding|Vulnerability|Issue)\s*#?\s*([0-9]+|FND-[0-9]+|ID-[0-9]+)(?:\s*:|\s*\n|\Z)', block)
+        finding_id = extract_field(["ID", "Finding ID"]) or (finding_id_match.group(1) if finding_id_match else f"{idx:03d}")
+        
+        finding_title = extract_field(["Title", "Finding Title", "Vulnerability", "Name"])
+        if not finding_title:
+            lines = [l.strip() for l in block.split('\n') if l.strip()]
+            if lines:
+                candidate = re.sub(r'(?i)^(?:FINDING|Finding|Vulnerability|Issue|\d+[\.\:]\s*)\s*(?:#?\s*(?:[0-9]+|FND-[0-9]+)\s*[:\-]?\s*)?', '', lines[0]).strip()
+                if candidate and len(candidate) > 2:
+                    finding_title = candidate
+                elif len(lines) > 1:
+                    finding_title = lines[1].strip()
+
+        if not finding_title:
+            finding_title = f"Finding {idx}"
+
+        finding_severity = extract_field(["Severity", "Risk Level", "Risk"]) or "Medium"
+        finding_endpoint = extract_field(["Affected Endpoint", "Endpoint", "Asset", "URL", "Location"]) or "/"
+        finding_description = extract_field(["Description", "Details", "Summary"])
+        finding_evidence = extract_field(["Evidence", "Proof of Concept", "Proof"])
+        finding_recommendation = extract_field(["Recommendation", "Remediation", "Solution", "Fix"])
+        finding_cvss = extract_field(["CVSS", "CVSS Score", "CVSS v3"])
+        finding_impact = extract_field(["Impact"])
+        finding_status = extract_field(["Status"]) or "Open"
+        finding_date = extract_field(["Date", "Date Detected", "Detected On"]) or datetime.now().strftime("%Y-%m-%d")
+
+        finding = create_finding_object(
+            id_val=finding_id,
+            title=finding_title,
+            severity=finding_severity,
+            endpoint=finding_endpoint,
+            description=finding_description,
+            evidence=finding_evidence,
+            recommendation=finding_recommendation,
+            cvss=finding_cvss,
+            impact=finding_impact,
+            status=finding_status,
+            date_detected=finding_date,
+            idx=idx,
+            report_id=report_id,
+            filename=filename
+        )
         all_findings.append(finding)
-    print("ALL FINDINGS:")
-    print(all_findings)
+
+    print("Parsed Text/PDF findings count:", len(all_findings))
     return all_findings
-            
 
 
 @app.post("/upload")
@@ -613,27 +834,30 @@ async def upload_file(file: UploadFile = File(...)):
         file_size = len(content)
         file_size_mb = round(file_size / (1024 * 1024), 2)
     if file.filename.lower().endswith(".pdf"):
-        reader=PdfReader(io.BytesIO(content))
+        reader = PdfReader(io.BytesIO(content))
         report_text = ""
         for page in reader.pages:
             text = page.extract_text()
             if text:
                 report_text += text + "\n"
     else:
-        report_text = content.decode("utf-8")
-    analysis = analyze_report(report_text)
+        report_text = content.decode("utf-8", errors="ignore")
+    
+    report_id = f"RPT-{int(datetime.now().timestamp()*1000)}"
+    analysis = analyze_report(report_text, filename=file.filename, report_id=report_id)
 
-    print("RETURNED ANALYSIS:")
-    print(analysis)
+    print("RETURNED ANALYSIS COUNT:", len(analysis))
     upload_time = datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
     
     upload_record = {
+        "report_id": report_id,
         "filename": file.filename,
         "file_type": file.filename.split(".")[-1].upper(),
         "file_size": f"{file_size_mb} MB",
         "status": "Completed",
         "findings_count": len(analysis),
         "upload_time": upload_time,
+        "date_detected": datetime.now().strftime("%Y-%m-%d"),
         "findings": analysis
     }
 
@@ -643,13 +867,20 @@ async def upload_file(file: UploadFile = File(...)):
     history.insert(0, upload_record)
     # Save history
     save_history(history)
-    print("UPLOAD HISTORY SAVED")
-    print("TOTAL UPLOADS:", len(history))
+    print("UPLOAD HISTORY SAVED. TOTAL UPLOADS:", len(history))
     return upload_record
 
 @app.get("/upload-history")
 def get_upload_history():
     history = load_history()
+    for upload in history:
+        raw_time = upload.get("upload_time", "")
+        rep_id = upload.get("report_id", "")
+        fn = upload.get("filename", "")
+        for finding in upload.get("findings", []):
+            finding["report_id"] = finding.get("report_id") or rep_id
+            finding["filename"] = finding.get("filename") or fn
+            normalize_finding_dict(finding, fallback_date=raw_time)
     return {
         "uploads": history
     }
@@ -664,74 +895,70 @@ def get_findings():
         }
     all_findings = []   
     for upload in history:
-        for finding in upload["findings"]:
+        raw_time = upload.get("upload_time", "")
+        rep_id = upload.get("report_id", "")
+        fn = upload.get("filename", "")
+        d_match = re.search(r'\d{4}-\d{2}-\d{2}', raw_time)
+        upload_date = d_match.group(0) if d_match else (raw_time.split(" ")[0] if raw_time else datetime.now().strftime("%Y-%m-%d"))
+        for finding in upload.get("findings", []):
+            finding_copy = dict(finding)
+            finding_copy["report_id"] = finding_copy.get("report_id") or rep_id
+            finding_copy["filename"] = finding_copy.get("filename") or fn
+            normalize_finding_dict(finding_copy, fallback_date=upload_date)
+            if "status" not in finding_copy or not finding_copy["status"]:
+                finding_copy["status"] = "Open"
 
-            if "status" not in finding or not finding["status"]:
-                finding["status"] = "Open"
-
-            if "date_detected" not in finding:
-                finding["date_detected"] = datetime.now().strftime("%Y-%m-%d")
-
-            if "type" not in finding:
-                title = finding.get("title", "")
-
-                if "Cross-Site Scripting" in title:
-                    finding["type"] = "XSS"
-                elif "SQL Injection" in title:
-                    finding["type"] = "Injection"
-                elif "Password" in title:
-                    finding["type"] = "Authentication"
-                elif "Access Control" in title:
-                    finding["type"] = "Access Control"
-                elif "Authentication" in title:
-                    finding["type"] = "Authentication"
-                elif "Configuration" in title or "Misconfiguration" in title:
-                    finding["type"] = "Configuration"
-                elif "Security Headers" in title:
-                    finding["type"] = "Security Header"
-                elif "Information Disclosure" in title:
-                    finding["type"] = "Information Leak"
-                elif "Information Leak" in title:
-                    finding["type"] = "Information Leak"
-                elif "Data Exposure" in title:
-                    finding["type"] = "Data Exposure"
+            if "type" not in finding_copy or not finding_copy["type"]:
+                title = finding_copy.get("title", "")
+                title_lower = title.lower()
+                if "xss" in title_lower or "cross-site script" in title_lower:
+                    finding_copy["type"] = "XSS"
+                elif "sql" in title_lower or "injection" in title_lower:
+                    finding_copy["type"] = "Injection"
+                elif "password" in title_lower or "auth" in title_lower:
+                    finding_copy["type"] = "Authentication"
+                elif "access control" in title_lower or "idor" in title_lower:
+                    finding_copy["type"] = "Access Control"
+                elif "configuration" in title_lower or "misconfig" in title_lower:
+                    finding_copy["type"] = "Configuration"
+                elif "header" in title_lower:
+                    finding_copy["type"] = "Security Header"
+                elif "disclosure" in title_lower or "leak" in title_lower:
+                    finding_copy["type"] = "Information Leak"
+                elif "dependency" in title_lower or "vulnerability" in title_lower:
+                    finding_copy["type"] = "Vulnerability"
                 else:
-                    finding["type"] = "Other"
-            
-            if "cvss" not in finding:
-                if finding.get("severity") == "Critical":
-                    finding["cvss"] = 9.8
-                elif finding.get("severity") == "High":
-                    finding["cvss"] = 8.5
-                elif finding.get("severity") == "Medium":
-                    finding["cvss"] = 6.5
-                elif finding.get("severity") == "Low":
-                    finding["cvss"] = 3.1
-                else:
-                    finding["cvss"] = 0.0
+                    finding_copy["type"] = "Other"
 
-            finding["filename"] = upload["filename"]
-            all_findings.append(finding)
+            if "cvss" not in finding_copy or finding_copy["cvss"] is None:
+                sev = finding_copy.get("severity", "Medium")
+                if sev == "Critical": finding_copy["cvss"] = 9.8
+                elif sev == "High": finding_copy["cvss"] = 8.5
+                elif sev == "Medium": finding_copy["cvss"] = 6.5
+                elif sev == "Low": finding_copy["cvss"] = 3.1
+                else: finding_copy["cvss"] = 0.0
 
-    save_history(history)
+            all_findings.append(finding_copy)
 
+    # Clean list of findings directly from upload history
     return {
         "findings": all_findings,
         "previous_findings_count": 0
     }
+
     
 @app.patch("/findings/{finding_id}/status")
 def update_finding_status(finding_id: str, status: str):
     history = load_history()
     for upload in history:
-        for finding in upload["findings"]:
-            if finding.get("id") == finding_id:
-                finding["status"] = status
+        for finding in upload.get("findings", []):
+            if str(finding.get("id")) == str(finding_id):
+                finding["status"] = status.capitalize()
                 save_history(history)
                 return {
                     "message": "Finding status updated",
                     "finding_id": finding_id,
-                    "status": status
+                    "status": status.capitalize()
                 }
     raise HTTPException(status_code=404, detail="Finding not found")
 
@@ -751,39 +978,41 @@ def generate_remediation(finding: dict):
     }
     
 @app.get("/finding")
-def get_finding(filename: str, finding_id: str):
+def get_finding(filename: str = None, finding_id: str = None):
     history = load_history()
     for upload in history:
-        if upload["filename"] == filename:
-            for finding in upload["findings"]:
-                if finding["id"] == finding_id:
+        if not filename or upload.get("filename") == filename:
+            for finding in upload.get("findings", []):
+                if str(finding.get("id")) == str(finding_id):
+                    norm_finding = normalize_finding_dict(dict(finding), fallback_date=upload.get("upload_time"))
+                    norm_finding["filename"] = upload.get("filename")
+                    norm_finding["report_id"] = upload.get("report_id")
                     return {
-                        "finding": finding
+                        "finding": norm_finding
                     }
-    return {
-        "error": "Finding not found"
-    }
+    raise HTTPException(status_code=404, detail="Finding not found")
     
 @app.get("/ai-remediation")
-def get_ai_remediation(filename: str, finding_id: str):
+def get_ai_remediation(filename: str = None, finding_id: str = None):
     history = load_history()
     for upload in history:
-        if upload["filename"] == filename:
-            for finding in upload["findings"]:
-                if finding["id"] == finding_id:
+        if not filename or upload.get("filename") == filename:
+            for finding in upload.get("findings", []):
+                if str(finding.get("id")) == str(finding_id):
+                    norm_finding = normalize_finding_dict(dict(finding), fallback_date=upload.get("upload_time"))
+                    norm_finding["filename"] = upload.get("filename")
+                    norm_finding["report_id"] = upload.get("report_id")
                     return {
-                        "finding": finding,
+                        "finding": norm_finding,
                         "remediation": {
-                            "recommended_fix": finding.get("recommendation", ""),
-                            "why_this_works": "The recommended remediation addresses the root cause of the vulnerability and reduces the risk of exploitation.",
+                            "recommended_fix": norm_finding.get("recommendation", ""),
+                            "why_this_works": "The recommended remediation addresses the root cause of the vulnerability.",
                             "additional_recommendations": [],
                             "implementation_steps": [],
                             "confidence": 95
                         }
                     }
-    return {
-        "error": "Finding not found"
-    }
+    raise HTTPException(status_code=404, detail="Finding not found")
     
 @app.get("/severity-history")
 def get_severity_history():

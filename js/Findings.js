@@ -19,31 +19,22 @@ async function loadFindings() {
             }
         }
     } catch (error) {
-        console.warn("Backend findings fetch failed, using local storage:", error);
+        console.warn("Backend findings fetch failed:", error);
     }
 
-    try {
-        const localHistory = JSON.parse(localStorage.getItem("uploadHistory")) || [];
-        if (localHistory.length > 0) {
-            const existingIds = new Set(findingsList.map(f => f.id || f.title));
-            localHistory.forEach(upload => {
-                const uploadFindings = upload.findings || [];
-                uploadFindings.forEach(finding => {
-                    const id = finding.id || finding.title;
-                    if (!existingIds.has(id)) {
-                        findingsList.unshift({
-                            ...finding,
-                            upload_time: upload.upload_time,
-                            filename: upload.filename
-                        });
-                        existingIds.add(id);
-                    }
-                });
-            });
+    // Clean & standardize fields for all findings
+    findingsList.forEach(f => {
+        const rawDate = f.date_detected || f.date || (f.upload_time ? f.upload_time.split(" ")[0] : "");
+        f.date_detected = (rawDate && typeof rawDate === "string" && rawDate.trim() !== "" && rawDate.toLowerCase() !== "undefined" && rawDate.toLowerCase() !== "null" && rawDate.toLowerCase() !== "none") ? rawDate.trim().split(" ")[0] : new Date().toISOString().split("T")[0];
+        if (!f.type) f.type = "Other";
+        if (!f.cvss) {
+            if (f.severity === "Critical") f.cvss = 9.8;
+            else if (f.severity === "High") f.cvss = 8.5;
+            else if (f.severity === "Medium") f.cvss = 6.5;
+            else if (f.severity === "Low") f.cvss = 3.1;
+            else f.cvss = 0.0;
         }
-    } catch (e) {
-        console.error("Error reading uploadHistory from localStorage in Findings.js:", e);
-    }
+    });
 
     allFindings = findingsList;
     filteredFindings = allFindings;
@@ -54,6 +45,8 @@ async function loadFindings() {
     updateHighCard(allFindings);
     updateMediumCard(allFindings);
     updateLowCard(allFindings);
+    populateDynamicDropdowns(allFindings);
+
     const totalCountEl = document.getElementById("totalFindingsCount");
     if (totalCountEl) {
         totalCountEl.textContent = allFindings.length;
@@ -71,6 +64,65 @@ async function loadFindings() {
         }
     } catch (err) {
         console.warn("Severity history fetch offline:", err);
+    }
+}
+
+function populateDynamicDropdowns(findings) {
+    const assetsDropdown = document.getElementById("assetsDropdown");
+    const assetsText = document.getElementById("assetsText");
+    if (assetsDropdown && assetsText) {
+        const uniqueAssets = Array.from(new Set(findings.map(f => f.endpoint).filter(Boolean)));
+        assetsDropdown.innerHTML = `<button class="assetsOption w-full text-left px-3 py-2 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">All Assets</button>`;
+        uniqueAssets.forEach(asset => {
+            assetsDropdown.innerHTML += `<button class="assetsOption w-full text-left px-3 py-2 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md truncate">${asset}</button>`;
+        });
+        
+        assetsDropdown.querySelectorAll(".assetsOption").forEach(option => {
+            option.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const selectedAsset = option.textContent.trim();
+                assetsText.textContent = selectedAsset;
+                assetsDropdown.classList.add("hidden");
+                if (selectedAsset === "All Assets") {
+                    filteredFindings = allFindings;
+                } else {
+                    filteredFindings = allFindings.filter(finding => finding.endpoint === selectedAsset);
+                }
+                currentPage = 1;
+                displayPage(filteredFindings);
+                updatePagination(filteredFindings);
+            });
+        });
+    }
+
+    const typesDropdown = document.getElementById("typesDropdown");
+    const typesText = document.getElementById("typesText");
+    if (typesDropdown && typesText) {
+        const uniqueTypes = Array.from(new Set(findings.map(f => f.type).filter(Boolean)));
+        typesDropdown.innerHTML = `<button class="typesOption w-full text-left px-3 py-2 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">All Types</button>`;
+        uniqueTypes.forEach(typeVal => {
+            typesDropdown.innerHTML += `<button class="typesOption w-full text-left px-3 py-2 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">${typeVal}</button>`;
+        });
+
+        typesDropdown.querySelectorAll(".typesOption").forEach(option => {
+            option.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const selectedType = option.textContent.trim();
+                typesText.textContent = selectedType;
+                typesDropdown.classList.add("hidden");
+                if (selectedType === "All Types") {
+                    filteredFindings = allFindings;
+                } else {
+                    filteredFindings = allFindings.filter(finding =>
+                        (finding.type || "").toLowerCase().includes(selectedType.toLowerCase()) ||
+                        (finding.title || "").toLowerCase().includes(selectedType.toLowerCase())
+                    );
+                }
+                currentPage = 1;
+                displayPage(filteredFindings);
+                updatePagination(filteredFindings);
+            });
+        });
     }
 }
 
@@ -179,6 +231,15 @@ function displayFindings(findings) {
                     </button>
                 </div>
             </td>`;
+        const viewBtn = row.querySelector(".viewFindingBtn");
+        if (viewBtn) {
+            viewBtn.addEventListener("click", () => {
+                localStorage.setItem("selectedFinding", JSON.stringify(finding));
+                const paramId = encodeURIComponent(finding.id || "");
+                const paramFile = encodeURIComponent(finding.filename || "");
+                window.location.href = `AI_Remediation.html?id=${paramId}&filename=${paramFile}`;
+            });
+        }
         tableBody.appendChild(row);
     });
     lucide.createIcons();
@@ -667,8 +728,8 @@ document.getElementById("findingsTableBody").addEventListener("click", (e) => {
     document.getElementById("viewFindingEndpoint").textContent =
         finding.endpoint || "-";
 
-    document.getElementById("viewFindingDate").textContent =
-        finding.date_detected || "-";
+    const modalDate = finding.date_detected && finding.date_detected !== "undefined" && finding.date_detected !== "null" ? finding.date_detected : new Date().toISOString().split("T")[0];
+    document.getElementById("viewFindingDate").textContent = modalDate;
 
     document.getElementById("viewFindingDescription").textContent =
         finding.description || "-";
@@ -691,11 +752,18 @@ closeViewFinding.addEventListener("click", () => {
 });
 
 const aiRemediationBtn = document.getElementById("aiRemediationBtn");
-aiRemediationBtn.addEventListener("click", () => {
-    localStorage.setItem("selectedFinding",JSON.stringify(selectedFinding));
-    console.log("Finding saved for AI Remediation");
-    window.location.href = "AI_Remediation.html";
-});
+if (aiRemediationBtn) {
+    aiRemediationBtn.addEventListener("click", () => {
+        if (selectedFinding) {
+            localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
+            const paramId = encodeURIComponent(selectedFinding.id || "");
+            const paramFile = encodeURIComponent(selectedFinding.filename || "");
+            window.location.href = `AI_Remediation.html?id=${paramId}&filename=${paramFile}`;
+        } else {
+            window.location.href = "AI_Remediation.html";
+        }
+    });
+}
 
 function displayPage(findings) {
     const start = (currentPage - 1) * findingsPerPage;

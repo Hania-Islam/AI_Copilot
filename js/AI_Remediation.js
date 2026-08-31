@@ -9,18 +9,38 @@ try {
 }
 
 async function initAIRemediation() {
-    if (!selectedFinding || !selectedFinding.title) {
-        console.log("NO VALID SELECTED FINDING FOUND, FETCHING DEFAULT FROM BACKEND...");
-        try {
-            const apiUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
-            const res = await fetch(apiUrl);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramId = urlParams.get("id");
+    const paramFile = urlParams.get("filename");
+
+    let findings = [];
+    try {
+        const apiUrl = window.getApiUrl ? window.getApiUrl('/findings') : '/findings';
+        const res = await fetch(apiUrl);
+        if (res.ok) {
             const data = await res.json();
-            if (data && data.findings && data.findings.length > 0) {
-                selectedFinding = data.findings[0];
-                localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
-            }
-        } catch (err) {
-            console.error("FAILED TO FETCH DEFAULT FINDING:", err);
+            findings = data.findings || [];
+        }
+    } catch (err) {}
+
+    if (paramId || paramFile) {
+        let matched = null;
+        if (paramId && paramFile) {
+            matched = findings.find(f => String(f.id) === String(paramId) && f.filename === paramFile);
+        }
+        if (!matched && paramId) {
+            matched = findings.find(f => String(f.id) === String(paramId));
+        }
+        if (matched) {
+            selectedFinding = matched;
+            localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
+        }
+    }
+
+    if (!selectedFinding || !selectedFinding.title) {
+        if (findings.length > 0) {
+            selectedFinding = findings[0];
+            localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
         }
     }
 
@@ -98,7 +118,13 @@ async function initAIRemediation() {
     }
     }
     const elemDate = document.getElementById("remediationFindingDate");
-    if (elemDate) elemDate.textContent = `• Detected on ${selectedFinding.date_detected || ''}`;
+    const rawDate = selectedFinding.date_detected || selectedFinding.date;
+    let detectedDateStr = (rawDate && typeof rawDate === "string" && rawDate !== "undefined" && rawDate !== "null" && rawDate.trim() !== "") ? rawDate.trim().split(" ")[0] : "";
+    if (!detectedDateStr) {
+        detectedDateStr = (selectedFinding.upload_time ? selectedFinding.upload_time.split(" ")[0] : new Date().toISOString().split("T")[0]);
+    }
+    selectedFinding.date_detected = detectedDateStr;
+    if (elemDate) elemDate.textContent = `• Detected on ${detectedDateStr}`;
     const elemEndpoint = document.getElementById("remediationFindingEndpoint");
     if (elemEndpoint) elemEndpoint.textContent = selectedFinding.endpoint || '';
     const elemType = document.getElementById("remediationFindingType");
@@ -689,7 +715,14 @@ if (copySecureCode) {
 const viewDocumentationBtn = document.getElementById("viewDocumentationBtn");
 if (viewDocumentationBtn) {
     viewDocumentationBtn.addEventListener("click", () => {
-        window.location.href = "findings_documentation.html";
+        if (selectedFinding) {
+            localStorage.setItem("selectedFinding", JSON.stringify(selectedFinding));
+            const paramId = encodeURIComponent(selectedFinding.id || "");
+            const paramTitle = encodeURIComponent(selectedFinding.title || "");
+            window.location.href = `findings_documentation.html?id=${paramId}&title=${paramTitle}`;
+        } else {
+            window.location.href = "findings_documentation.html";
+        }
     });
 }
 }

@@ -1,3 +1,29 @@
+function parseDateString(dateStr) {
+    if (!dateStr) return new Date(NaN);
+    if (dateStr instanceof Date) return dateStr;
+    let cleaned = String(dateStr).trim();
+    let normalized = cleaned.replace(/^(\d{4})[\./](\d{1,2})[\./](\d{1,2})/, '$1-$2-$3');
+    normalized = normalized.replace(/a\.m\./i, 'AM').replace(/p\.m\./i, 'PM');
+
+    const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2})[:.](\d{1,2})(?:[:.](\d{1,2}))?\s*(AM|PM)?)?/i);
+    if (match) {
+        let year = parseInt(match[1], 10);
+        let month = parseInt(match[2], 10) - 1;
+        let day = parseInt(match[3], 10);
+        let hour = match[4] ? parseInt(match[4], 10) : 0;
+        let min = match[5] ? parseInt(match[5], 10) : 0;
+        let sec = match[6] ? parseInt(match[6], 10) : 0;
+        let ampm = match[7] ? match[7].toUpperCase() : null;
+        if (ampm === "PM" && hour < 12) hour += 12;
+        if (ampm === "AM" && hour === 12) hour = 0;
+        return new Date(year, month, day, hour, min, sec);
+    }
+    
+    let d = new Date(normalized);
+    if (!isNaN(d.getTime())) return d;
+    return new Date(NaN);
+}
+
 let allUploads = [];
 let currentTimeFilter = "All Time";
 let currentPage = 1;
@@ -35,26 +61,15 @@ async function loadHistory() {
         const response = await fetch(historyUrl);
         if (response.ok) {
             const data = await response.json();
-            uploads = data.uploads || [];
+            if (data && Array.isArray(data.uploads)) {
+                uploads = data.uploads;
+            }
         }
     } catch (error) {
-        console.warn("Backend history fetch failed, using local storage:", error);
+        console.warn("Backend history fetch failed:", error);
     }
 
-    try {
-        const localHistory = JSON.parse(localStorage.getItem("uploadHistory")) || [];
-        if (localHistory.length > 0) {
-            const existingKeys = new Set(uploads.map(u => (u.filename || "") + "_" + (u.upload_time || "")));
-            localHistory.forEach(localUpload => {
-                const key = (localUpload.filename || "") + "_" + (localUpload.upload_time || "");
-                if (!existingKeys.has(key)) {
-                    uploads.unshift(localUpload);
-                }
-            });
-        }
-    } catch (e) {
-        console.error("Error reading uploadHistory from localStorage in History.js:", e);
-    }
+    uploads.sort((a, b) => parseDateString(b.upload_time) - parseDateString(a.upload_time));
 
     allUploads = uploads;
     filteredUploads = allUploads;
@@ -66,8 +81,9 @@ async function loadHistory() {
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
         const thisMonthReports = uploads.filter(upload => {
-            const uploadDate = new Date(upload.upload_time);
+            const uploadDate = parseDateString(upload.upload_time);
             return (
+                !isNaN(uploadDate.getTime()) &&
                 uploadDate.getMonth() === currentMonth &&
                 uploadDate.getFullYear() === currentYear
             );
@@ -82,8 +98,9 @@ async function loadHistory() {
 
         const thisMonthFindings = uploads
         .filter(upload => {
-            const uploadDate = new Date(upload.upload_time);
+            const uploadDate = parseDateString(upload.upload_time);
             return (
+                !isNaN(uploadDate.getTime()) &&
                 uploadDate.getMonth() === currentMonth &&
                 uploadDate.getFullYear() === currentYear
             );
@@ -107,8 +124,9 @@ async function loadHistory() {
     document.getElementById("avgRiskScore").textContent =
         `${avgRiskScore}%`;
         const thisMonthUploads = uploads.filter(upload => {
-            const uploadDate = new Date(upload.upload_time);
+            const uploadDate = parseDateString(upload.upload_time);
             return (
+                !isNaN(uploadDate.getTime()) &&
                 uploadDate.getMonth() === currentMonth &&
                 uploadDate.getFullYear() === currentYear
             );
@@ -130,23 +148,24 @@ async function loadHistory() {
             // grid 4
             const resolvedIssues = uploads.reduce((total, upload) => {
                 return total + (upload.findings || []).filter(
-                    finding => finding.status?.toLowerCase() === "fixed"
+                    finding => (finding.status || "").toLowerCase() === "fixed" || (finding.status || "").toLowerCase() === "resolved"
                 ).length;
             }, 0);
             document.getElementById("resolvedIssues").textContent =resolvedIssues;
 
             const thisMonthResolved = uploads
     .filter(upload => {
-        const uploadDate = new Date(upload.upload_time);
+        const uploadDate = parseDateString(upload.upload_time);
 
         return (
+            !isNaN(uploadDate.getTime()) &&
             uploadDate.getMonth() === currentMonth &&
             uploadDate.getFullYear() === currentYear
         );
     })
     .reduce((total, upload) => {
         return total + (upload.findings || []).filter(
-            finding => finding.status?.toLowerCase() === "fixed"
+            finding => (finding.status || "").toLowerCase() === "fixed" || (finding.status || "").toLowerCase() === "resolved"
         ).length;
     }, 0);
    document.getElementById("resolvedChange").textContent = `↑ ${thisMonthResolved}`;
@@ -303,15 +322,21 @@ function calculateRiskScore(findings) {
     if (!findings || findings.length === 0) {
         return 0;
     }
-    const cvssScores = findings
-        .map(finding => Number(finding.cvss))
-        .filter(score => !isNaN(score));
+    const cvssScores = findings.map(finding => {
+        let cvss = Number(finding.cvss);
+        if (isNaN(cvss) || cvss === 0) {
+            const sev = (finding.severity || "").toLowerCase();
+            if (sev === "critical") cvss = 9.8;
+            else if (sev === "high") cvss = 8.5;
+            else if (sev === "medium") cvss = 6.5;
+            else if (sev === "low") cvss = 3.1;
+            else cvss = 5.0;
+        }
+        return cvss;
+    });
 
-    if (cvssScores.length === 0) {
-        return 0;
-    }
     const highestCvss = Math.max(...cvssScores);
-    return Math.round(highestCvss * 10);
+    return Math.min(100, Math.round(highestCvss * 10));
 }
 function getRiskColor(fileType) {
     switch (String(fileType || "").trim().toUpperCase()) {
@@ -333,7 +358,7 @@ function getRiskColor(fileType) {
 function filterByTime(uploads, filter) {
     const now = new Date();
     return uploads.filter(upload => {
-        const uploadDate = new Date(upload.upload_time);
+        const uploadDate = parseDateString(upload.upload_time);
         if (filter === "All Time") {
             return true;
         }
