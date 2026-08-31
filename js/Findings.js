@@ -111,13 +111,18 @@ async function loadFindings() {
         }
     });
 
-    // Deterministic sorting: Critical -> High -> Medium -> Low, then by date, then by title
+    // Sort findings: Newest upload/date detected first, then by Severity rank, then by Title
     const severityMap = { "Critical": 1, "High": 2, "Medium": 3, "Low": 4 };
     cleanedList.sort((a, b) => {
+        const timeA = (a.upload_time || a.date_detected || "").toString().trim();
+        const timeB = (b.upload_time || b.date_detected || "").toString().trim();
+        if (timeA && timeB && timeA !== timeB) {
+            return timeB.localeCompare(timeA);
+        }
         const sevA = severityMap[a.severity] || 5;
         const sevB = severityMap[b.severity] || 5;
         if (sevA !== sevB) return sevA - sevB;
-        return (b.date_detected || "").localeCompare(a.date_detected || "") || a.title.localeCompare(b.title);
+        return a.title.localeCompare(b.title);
     });
 
     allFindings = cleanedList;
