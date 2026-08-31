@@ -32,6 +32,10 @@
       "dest": "api/index.py"
     },
     {
+      "src": "/notifications",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/settings/(.*)",
       "dest": "api/index.py"
     },

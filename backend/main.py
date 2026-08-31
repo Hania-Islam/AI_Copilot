@@ -241,6 +241,23 @@ def update_updates_notification(data: dict):
         "message": "Product updates notification updated successfully",
         "enabled": settings["notifications"]["updates"]
     }
+
+@app.get("/notifications")
+def get_notifications():
+    history = load_history()
+    notifications = []
+    for upload in history[:5]:
+        findings_cnt = upload.get("findings_count", len(upload.get("findings", [])))
+        notifications.append({
+            "id": upload.get("report_id") or upload.get("filename"),
+            "title": f"Report {upload.get('filename')} analyzed ({findings_cnt} findings)",
+            "time": upload.get("upload_time", "Recently"),
+            "type": "critical" if findings_cnt > 3 else "info"
+        })
+    return {
+        "unread_count": len(notifications),
+        "notifications": notifications
+    }
     
 @app.put("/settings/appearance/theme")
 def update_theme(data: dict):

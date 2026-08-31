@@ -84,20 +84,26 @@ async function loadNotifications() {
         const apiUrl = window.getApiUrl ? window.getApiUrl('/notifications') : '/notifications';
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error("Failed to load notifications");
+            console.warn("Notifications API response not OK:", response.status);
+            return;
         }
         const data = await response.json();
         // Update notification number
         const notificationCount = document.getElementById("notificationCount");
         if (notificationCount) {
-            notificationCount.textContent = data.unread_count;
+            notificationCount.textContent = data.unread_count !== undefined ? data.unread_count : 0;
         }
 
         // Notification list
         const notificationList = document.getElementById("notificationList");
         if (!notificationList) return;
         notificationList.innerHTML = "";
-        data.notifications.forEach(notification => {
+        const notifs = data.notifications || [];
+        if (notifs.length === 0) {
+            notificationList.innerHTML = `<div class="px-4 py-3 text-xs text-slate-500">No new notifications</div>`;
+            return;
+        }
+        notifs.forEach(notification => {
             let icon = "bell";
             let iconClass = "text-blue-400";
             if (notification.type === "critical") {
@@ -129,10 +135,11 @@ async function loadNotifications() {
                 </div>
             `;
         });
-        // Re-render Lucide icons created dynamically
-        lucide.createIcons();
+        if (typeof lucide !== "undefined" && lucide.createIcons) {
+            lucide.createIcons();
+        }
     } catch (error) {
-        console.error("Error loading notifications:", error);
+        console.warn("Notifications fetch offline:", error.message);
     }
 }
 loadNotifications();
